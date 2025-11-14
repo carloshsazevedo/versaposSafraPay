@@ -1,4 +1,5 @@
 import {
+  ActivityIndicator,
   Alert,
   ScrollView,
   StyleSheet,
@@ -42,18 +43,24 @@ const Mesa = ({ route }: any) => {
   const [Taxa, setTaxa] = useState(0.0);
   const [Consumacao, setConsumacao] = useState(0.0);
   const [totalMesa, settotalMesa] = useState(0.0);
-  // const [totalMesaParcial, settotalMesaParcial] = useState(0.0);
   const { user } = useUser();
   const { empresa } = useEmpresa();
 
   const [itensmovimento, setitensmovimento] = useState([] as any[]);
+
+  const [pagamentos, setpagamentos] = useState<any[]>([]);
+  const [visibleModalFornecedor, setvisibleModalFornecedor] = useState(false);
+
+  // flags de loading
+  const [loadingMesa, setLoadingMesa] = useState(false);
+  const [loadingPagamentos, setLoadingPagamentos] = useState(false);
 
   // formatar data "2025-09-26T13:45:00.000Z" em "26/09/2025 13:45"
   const formatarData = useCallback((dataString: any) => {
     const data = new Date(dataString);
 
     const adicionarZero = (numero: number) =>
-      numero < 10 ? `0${numero}` : numero;
+      numero < 10 ? `0${numero}` : `${numero}`;
 
     const dia = adicionarZero(data.getUTCDate());
     const mes = adicionarZero(data.getUTCMonth() + 1);
@@ -65,14 +72,12 @@ const Mesa = ({ route }: any) => {
   }, []);
 
   const convertToHHMMSS = useCallback((decimalTime: any) => {
-    // Converte a parte decimal (dias) para horas
-    const totalSeconds = Math.floor(decimalTime * 24 * 3600); // 24 hours * 3600 seconds
+    const totalSeconds = Math.floor(decimalTime * 24 * 3600);
 
-    const hours = Math.floor(totalSeconds / 3600); // Converte para horas
-    const minutes = Math.floor((totalSeconds % 3600) / 60); // Converte o restante para minutos
-    const seconds = totalSeconds % 60; // O restante para segundos
+    const hours = Math.floor(totalSeconds / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = totalSeconds % 60;
 
-    // Formata para HH:MM:SS
     const formattedTime = [
       String(hours).padStart(2, '0'),
       String(minutes).padStart(2, '0'),
@@ -82,9 +87,6 @@ const Mesa = ({ route }: any) => {
     return formattedTime;
   }, []);
 
-  const [pagamentos, setpagamentos] = useState([]);
-  const [visibleModalFornecedor, setvisibleModalFornecedor] = useState(false);
-
   useEffect(() => {
     async function getParams() {
       const servername = user.servername;
@@ -93,45 +95,50 @@ const Mesa = ({ route }: any) => {
       const idempresa = empresa?.idparametro;
       const tipomovimento = empresa?.tipomovimentomesascomandas;
 
-      if (servername && serverport && pathbanco && idempresa && idmovimento) {
+      if (!servername || !serverport || !pathbanco || !idempresa || !idmovimento) {
+        return;
+      }
+
+      try {
+        setLoadingMesa(true);
+        setLoadingPagamentos(false);
+
+        // --- Consulta principal da mesa / cabeçalho ---
         const result = await ConsultaFornecedor({
           serverport: serverport,
           servername: servername,
           pathbanco: pathbanco,
           idmovimento: idmovimento,
-          idempresa: empresa?.idparametro,
+          idempresa: idempresa,
         });
 
-        setNomeCliente(result.data[0].nomeCliente);
-        setnomeFornecedor(
-          result.data[0].nomefornecedor ? result.data[0].nomefornecedor : '',
-        );
-        setcnpjFornecedor(
-          result.data[0].cnpjfornecedor ? result.data[0].cnpjfornecedor : '',
-        );
-        settipoFornecedor(
-          result.data[0].tipofornecedor ? result.data[0].tipofornecedor : '',
-        );
-        setnomeGarcom(result.data[0].nomefuncionario);
-        setdataAbertura(formatarData(result.data[0].datamovimento));
-        settempoUtilizacao(convertToHHMMSS(result.data[0].tempoutilizacao));
-        setTaxa(
-          result.data[0].valorservicomesa ? result.data[0].valorservicomesa : 0,
-        );
+        const dados = result.data?.[0];
+
+        if (!dados) {
+          Alert.alert('Atenção', 'Não foi possível carregar os dados da mesa.');
+          return;
+        }
+
+        setNomeCliente(dados.nomeCliente);
+        setnomeFornecedor(dados.nomefornecedor ? dados.nomefornecedor : '');
+        setcnpjFornecedor(dados.cnpjfornecedor ? dados.cnpjfornecedor : '');
+        settipoFornecedor(dados.tipofornecedor ? dados.tipofornecedor : '');
+        setnomeGarcom(dados.nomefuncionario);
+        setdataAbertura(formatarData(dados.datamovimento));
+        settempoUtilizacao(convertToHHMMSS(dados.tempoutilizacao));
+        setTaxa(dados.valorservicomesa ? dados.valorservicomesa : 0);
+
         setConsumacao(
-          result.data[0].qtepessoasmesa
-            ? (result.data[0].totalmovimento +
-                (result.data[0].valorservicomesa
-                  ? result.data[0].valorservicomesa
-                  : 0)) /
-                result.data[0].qtepessoasmesa
+          dados.qtepessoasmesa
+            ? (dados.totalmovimento +
+                (dados.valorservicomesa ? dados.valorservicomesa : 0)) /
+                dados.qtepessoasmesa
             : 0,
         );
-        settotalMesa(
-          result.data[0].totalmovimento ? result.data[0].totalmovimento : 0,
-        );
-        // settotalMesaParcial(result.data[0].totalmovimentobruto ? result.data[0].totalmovimentobruto : 0)
 
+        settotalMesa(dados.totalmovimento ? dados.totalmovimento : 0);
+
+        // --- Itens da mesa ---
         const result2 = await ItemmovimentoPesquisaitemmovimentocomandas({
           servername: servername,
           serverport: serverport,
@@ -141,22 +148,36 @@ const Mesa = ({ route }: any) => {
           idempresa: idempresa,
         });
 
-        // Alert.alert('Resultado:', JSON.stringify(result2.data));
+        setitensmovimento(result2.data ?? []);
 
-        setitensmovimento(result2.data);
+        // --- Pagamentos (sem overlay global, só card com spinner) ---
+        if (empresa?.geraparcelaversapospagamento === 'S') {
+          try {
+            setLoadingPagamentos(true);
 
-        if (empresa.geraparcelaversapospagamento === 'S') {
-          const result3 = await ConsultaMovimentoPagamento({
-            serverport: serverport,
-            servername: servername,
-            pathbanco: pathbanco,
-            idmovimento: idmovimento,
-            idempresa: idempresa,
-          });
+            const result3 = await ConsultaMovimentoPagamento({
+              serverport: serverport,
+              servername: servername,
+              pathbanco: pathbanco,
+              idmovimento: idmovimento,
+              idempresa: idempresa,
+            });
 
-          // Alert.alert("pagamentos retornados:", JSON.stringify(result3.data))
-          setpagamentos(result3.data);
+            setpagamentos(result3.data ?? []);
+          } finally {
+            setLoadingPagamentos(false);
+          }
+        } else {
+          setpagamentos([]);
         }
+      } catch (error: any) {
+        console.error('Erro ao carregar dados da mesa:', error);
+        Alert.alert(
+          'Erro',
+          'Ocorreu um problema ao carregar os dados da mesa. Tente novamente.',
+        );
+      } finally {
+        setLoadingMesa(false);
       }
     }
 
@@ -164,7 +185,7 @@ const Mesa = ({ route }: any) => {
   }, [route.params?.data]);
 
   async function removerItem(iditemmovimento: any) {
-    console.log('Função ativada!');
+    console.log('Função removerItem ativada!');
 
     const servername = user.servername;
     const serverport = user.serverport;
@@ -181,21 +202,25 @@ const Mesa = ({ route }: any) => {
       idempresa: idempresa,
     });
 
-    if (resultado){}
-    const dataenviar = new Date()
-
-    reset(Rotas.Mesa, {
-      idmovimento: idmovimento,
-      nummesa: route?.params?.nummesa,
-      data: `${dataenviar}`,
-      statusmesa: route?.params?.statusmesa,
-    });
+    if (resultado) {
+      const dataenviar = new Date();
+      reset(Rotas.Mesa, {
+        idmovimento: idmovimento,
+        nummesa: route?.params?.nummesa,
+        data: `${dataenviar}`,
+        statusmesa: route?.params?.statusmesa,
+      });
+    }
   }
+
+  const totalPago = pagamentos.reduce(
+    (soma, pagamento: any) => soma + (pagamento.valor || 0),
+    0,
+  );
+  const totalRestante = Number((totalMesa - totalPago).toFixed(2));
 
   return (
     <View style={s.mainView}>
-      {/* <Text></Text> */}
-
       <Cabecalho
         voltarFunction={() => {
           reset(Rotas.MapaMesas);
@@ -206,6 +231,7 @@ const Mesa = ({ route }: any) => {
         style={s.MainScrollView}
         showsVerticalScrollIndicator={false}
         showsHorizontalScrollIndicator={false}
+        scrollEnabled={!loadingMesa} // evita scroll enquanto overlay
       >
         <View style={s.CardsMesaView}>
           <CardNumMesa
@@ -239,6 +265,7 @@ const Mesa = ({ route }: any) => {
             </TouchableOpacity>
           )}
         </View>
+
         {idmovimento ? (
           <View>
             <View style={s.ViewMesaInfo}>
@@ -251,89 +278,83 @@ const Mesa = ({ route }: any) => {
             </View>
             <CardMesaInfo.TotalMesa total={totalMesa} />
 
+            {/* Card de receber pagamento (SafraPay) */}
             <CardReceberPagamento
-              total={Number((
-                  totalMesa -
-                  pagamentos.reduce(
-                    (soma, pagamento: any) => soma + pagamento.valor,
-                    0,
-                  )
-                ).toFixed(2))}
+              total={totalRestante}
               idmovimento={idmovimento}
               nummesa={route.params?.nummesa}
             />
-       
 
-            {/* <Text>
-              {String(
-                (
-                  totalMesa -
-                  pagamentos.reduce(
-                    (soma, pagamento: any) => soma + pagamento.valor,
-                    0,
-                  )
-                ).toFixed(2),
-              ).replace('.', '')}
-            </Text> */}
-            {pagamentos.length > 0 && (
-              <View style={s.parcelasView}>
-                <Text style={s.parcelasTitle}>Pagamentos</Text>
-                <View style={s.parcelasTitles}>
-                  <Text style={s.parcelasTitlesText}>Id</Text>
-                  <Text style={s.parcelasTitlesText}>Situação</Text>
-                  <Text style={s.parcelasTitlesText}>Valor</Text>
-                </View>
-                {pagamentos.map((pagamento: any, index: any) => (
-                  <View key={index} style={s.parcelaItemView}>
-                    <Text style={s.parcelaItemText}>
-                      {pagamento.idmovimentopagamento}
-                    </Text>
-                    <Text style={s.parcelaItemText}>Paga</Text>
-                    <Text style={s.parcelaItemText}>
-                      R$ {pagamento.valor.toFixed(2)}
-                    </Text>
+            {/* Pagamentos: card com activity indicator quando carregando */}
+            {empresa?.geraparcelaversapospagamento === 'S' && (
+              <>
+                {loadingPagamentos ? (
+                  <View style={s.parcelasView}>
+                    <Text style={s.parcelasTitle}>Pagamentos</Text>
+                    <View style={{ paddingVertical: 10, alignItems: 'center' }}>
+                      <ActivityIndicator size="small" color="#2A64D0" />
+                      <Text style={{ marginTop: 4, fontSize: 12 }}>
+                        Carregando pagamentos...
+                      </Text>
+                    </View>
                   </View>
-                ))}
-                <View style={[s.totalItenspagamentoView, { marginTop: 10 }]}>
-                  <Text
-                    style={[s.parcelaItemText, s.texttotalizadorespagamento]}
-                  >
-                    Total pago:
-                  </Text>
-                  <Text style={s.textTotalpagamentos}>
-                    R${' '}
-                    {String(
-                      pagamentos
-                        .reduce(
-                          (soma, pagamento: any) => soma + pagamento.valor,
-                          0,
-                        )
-                        .toFixed(2),
-                    ).replace('.', ',')}
-                  </Text>
-                </View>
-                <View style={[s.totalItenspagamentoView, { marginTop: 10 }]}>
-                  <Text
-                    style={[s.parcelaItemText, s.texttotalizadorespagamento]}
-                  >
-                    Total restante:
-                  </Text>
-                  <Text style={s.textTotalpagamentos}>
-                    R${' '}
-                    {String(
-                      (
-                        totalMesa -
-                        pagamentos.reduce(
-                          (soma, pagamento: any) => soma + pagamento.valor,
-                          0,
-                        )
-                      ).toFixed(2),
-                    ).replace('.', ',')}
-                  </Text>
-                </View>
-              </View>
+                ) : (
+                  pagamentos.length > 0 && (
+                    <View style={s.parcelasView}>
+                      <Text style={s.parcelasTitle}>Pagamentos</Text>
+                      <View style={s.parcelasTitles}>
+                        <Text style={s.parcelasTitlesText}>Id</Text>
+                        <Text style={s.parcelasTitlesText}>Situação</Text>
+                        <Text style={s.parcelasTitlesText}>Valor</Text>
+                      </View>
+                      {pagamentos.map((pagamento: any, index: any) => (
+                        <View key={index} style={s.parcelaItemView}>
+                          <Text style={s.parcelaItemText}>
+                            {pagamento.idmovimentopagamento}
+                          </Text>
+                          <Text style={s.parcelaItemText}>Paga</Text>
+                          <Text style={s.parcelaItemText}>
+                            R$ {pagamento.valor.toFixed(2)}
+                          </Text>
+                        </View>
+                      ))}
+                      <View
+                        style={[s.totalItenspagamentoView, { marginTop: 10 }]}
+                      >
+                        <Text
+                          style={[
+                            s.parcelaItemText,
+                            s.texttotalizadorespagamento,
+                          ]}
+                        >
+                          Total pago:
+                        </Text>
+                        <Text style={s.textTotalpagamentos}>
+                          R${' '}
+                          {String(totalPago.toFixed(2)).replace('.', ',')}
+                        </Text>
+                      </View>
+                      <View
+                        style={[s.totalItenspagamentoView, { marginTop: 10 }]}
+                      >
+                        <Text
+                          style={[
+                            s.parcelaItemText,
+                            s.texttotalizadorespagamento,
+                          ]}
+                        >
+                          Total restante:
+                        </Text>
+                        <Text style={s.textTotalpagamentos}>
+                          R${' '}
+                          {String(totalRestante.toFixed(2)).replace('.', ',')}
+                        </Text>
+                      </View>
+                    </View>
+                  )
+                )}
+              </>
             )}
-            {/* <Text>{String(totalMesa.toFixed(2)).replace('.','')}</Text> */}
           </View>
         ) : (
           <CardMesaDisponivel nummesa={route.params?.nummesa} />
@@ -370,6 +391,7 @@ const Mesa = ({ route }: any) => {
         />
       </ScrollView>
 
+      {/* Modal de seleção de parceiro */}
       <ModalSelecionarFornecedor
         visible={visibleModalFornecedor}
         onClose={() => {
@@ -379,6 +401,16 @@ const Mesa = ({ route }: any) => {
         nummesa={route?.params?.nummesa}
         statusmesa={route?.params?.statusmesa}
       />
+
+      {/* Overlay de carregamento geral (mesa + itens) */}
+      {loadingMesa && (
+        <View style={s.loadingOverlay}>
+          <View style={s.loadingBox}>
+            <ActivityIndicator size="large" color="#2A64D0" />
+            <Text style={s.loadingText}>Carregando dados da mesa...</Text>
+          </View>
+        </View>
+      )}
     </View>
   );
 };
@@ -485,6 +517,31 @@ const s = StyleSheet.create({
     textAlign: 'right',
     paddingRight: 10,
     fontWeight: 'bold',
+  },
+
+  // overlay
+  loadingOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0,0,0,0.35)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingBox: {
+    backgroundColor: '#fff',
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    borderRadius: 10,
+    alignItems: 'center',
+    elevation: 4,
+  },
+  loadingText: {
+    marginTop: 8,
+    fontSize: 14,
+    color: '#333',
   },
 });
 
