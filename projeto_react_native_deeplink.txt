@@ -1,0 +1,5968 @@
+---------- "android\app\src\main\AndroidManifest.xml" ---------- 
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <application
+      android:name=".MainApplication"
+      android:label="@string/app_name"
+      android:icon="@mipmap/ic_launcher"
+      android:roundIcon="@mipmap/ic_launcher_round"
+      android:allowBackup="false"
+      android:theme="@style/AppTheme"
+      android:usesCleartextTraffic="true">
+      <activity
+        android:name=".MainActivity"
+        android:label="@string/app_name"
+        android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|screenSize|smallestScreenSize|uiMode"
+        android:launchMode="singleTask"
+        android:windowSoftInputMode="adjustResize"
+        android:exported="true">
+        <intent-filter>
+            <action android:name="android.intent.action.MAIN" />
+            <category android:name="android.intent.category.LAUNCHER" />
+        </intent-filter>
+        <intent-filter>
+            <action android:name="android.intent.action.VIEW" />
+            <category android:name="android.intent.category.DEFAULT" />
+            <category android:name="android.intent.category.BROWSABLE" />
+            <data android:scheme="reactnativeversapos" android:host="pay-response" />
+        </intent-filter>
+        <intent-filter>
+            <action android:name="android.intent.action.VIEW" />
+            <category android:name="android.intent.category.DEFAULT" />
+            <category android:name="android.intent.category.BROWSABLE" />
+            <data android:scheme="reactnativeversapos" android:host="print" />
+        </intent-filter>
+      </activity>
+    </application>
+</manifest>
+---------- "android\app\src\release\java\com\versapos\ReactNativeFlipper.java" ---------- 
+/**
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
+ *
+ * <p>This source code is licensed under the MIT license found in the LICENSE file in the root
+ * directory of this source tree.
+ */
+package com.versapos;
+
+import android.content.Context;
+import com.facebook.react.ReactInstanceManager;
+
+/**
+ * Class responsible of loading Flipper inside your React Native application. This is the release
+ * flavor of it so it's empty as we don't want to load Flipper.
+ */
+public class ReactNativeFlipper {
+  public static void initializeFlipper(Context context, ReactInstanceManager reactInstanceManager) {
+    // Do nothing as we don't want to initialize Flipper on Release.
+  }
+}
+---------- "android\app\build.gradle" ---------- 
+apply plugin: "com.android.application"
+apply plugin: "com.facebook.react"
+
+/**
+ * This is the configuration block to customize your React Native Android app.
+ * By default you don't need to apply any configuration, just uncomment the lines you need.
+ */
+react {
+    /* Folders */
+    //   The root of your project, i.e. where "package.json" lives. Default is '..'
+    // root = file("../")
+    //   The folder where the react-native NPM package is. Default is ../node_modules/react-native
+    // reactNativeDir = file("../node_modules/react-native")
+    //   The folder where the react-native Codegen package is. Default is ../node_modules/@react-native/codegen
+    // codegenDir = file("../node_modules/@react-native/codegen")
+    //   The cli.js file which is the React Native CLI entrypoint. Default is ../node_modules/react-native/cli.js
+    // cliFile = file("../node_modules/react-native/cli.js")
+
+    /* Variants */
+    //   The list of variants to that are debuggable. For those we're going to
+    //   skip the bundling of the JS bundle and the assets. By default is just 'debug'.
+    //   If you add flavors like lite, prod, etc. you'll have to list your debuggableVariants.
+    // debuggableVariants = ["liteDebug", "prodDebug"]
+
+    /* Bundling */
+    //   A list containing the node command and its flags. Default is just 'node'.
+    // nodeExecutableAndArgs = ["node"]
+    //
+    //   The command to run when bundling. By default is 'bundle'
+    // bundleCommand = "ram-bundle"
+    //
+    //   The path to the CLI configuration file. Default is empty.
+    // bundleConfig = file(../rn-cli.config.js)
+    //
+    //   The name of the generated asset file containing your JS bundle
+    // bundleAssetName = "MyApplication.android.bundle"
+    //
+    //   The entry file for bundle generation. Default is 'index.android.js' or 'index.js'
+    // entryFile = file("../js/MyApplication.android.js")
+    //
+    //   A list of extra flags to pass to the 'bundle' commands.
+    //   See https://github.com/react-native-community/cli/blob/main/docs/commands.md#bundle
+    // extraPackagerArgs = []
+
+    /* Hermes Commands */
+    //   The hermes compiler command to run. By default it is 'hermesc'
+    // hermesCommand = "$rootDir/my-custom-hermesc/bin/hermesc"
+    //
+    //   The list of flags to pass to the Hermes compiler. By default is "-O", "-output-source-map"
+    // hermesFlags = ["-O", "-output-source-map"]
+}
+
+/**
+ * Set this to true to Run Proguard on Release builds to minify the Java bytecode.
+ */
+def enableProguardInReleaseBuilds = false
+
+/**
+ * The preferred build flavor of JavaScriptCore (JSC)
+ *
+ * For example, to use the international variant, you can use:
+ * `def jscFlavor = 'org.webkit:android-jsc-intl:+'`
+ *
+ * The international variant includes ICU i18n library and necessary data
+ * allowing to use e.g. `Date.toLocaleString` and `String.localeCompare` that
+ * give correct results when using with locales other than en-US. Note that
+ * this variant is about 6MiB larger per architecture than default.
+ */
+def jscFlavor = 'org.webkit:android-jsc:+'
+
+android {
+    ndkVersion rootProject.ext.ndkVersion
+
+    compileSdkVersion rootProject.ext.compileSdkVersion
+
+    namespace "br.com.versati.versapos.mobile"
+    defaultConfig {
+        applicationId "br.com.versati.versapos.mobile"
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
+        versionCode 1
+        versionName "1.0"
+    }
+    signingConfigs {
+        debug {
+            storeFile file('debug.keystore')
+            storePassword 'android'
+            keyAlias 'androiddebugkey'
+            keyPassword 'android'
+        }
+    }
+    buildTypes {
+        debug {
+            signingConfig signingConfigs.debug
+        }
+        release {
+            // Caution! In production, you need to generate your own keystore file.
+            // see https://reactnative.dev/docs/signed-apk-android.
+            signingConfig signingConfigs.debug
+            minifyEnabled enableProguardInReleaseBuilds
+            proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
+        }
+    }
+}
+
+dependencies {
+    // The version of react-native is set by the React Native Gradle Plugin
+    implementation("com.facebook.react:react-android")
+
+    debugImplementation("com.facebook.flipper:flipper:${FLIPPER_VERSION}")
+    debugImplementation("com.facebook.flipper:flipper-network-plugin:${FLIPPER_VERSION}") {
+        exclude group:'com.squareup.okhttp3', module:'okhttp'
+    }
+
+    debugImplementation("com.facebook.flipper:flipper-fresco-plugin:${FLIPPER_VERSION}")
+    if (hermesEnabled.toBoolean()) {
+        implementation("com.facebook.react:hermes-android")
+    } else {
+        implementation jscFlavor
+    }
+}
+
+apply from: file("../../node_modules/@react-native-community/cli-platform-android/native_modules.gradle"); applyNativeModulesAppBuildGradle(project)
+---------- "android\build.gradle" ---------- 
+// Top-level build file where you can add configuration options common to all sub-projects/modules.
+
+buildscript {
+    ext {
+        buildToolsVersion = "33.0.0"
+        minSdkVersion = 21
+        compileSdkVersion = 33
+        targetSdkVersion = 33
+
+        // We use NDK 23 which has both M1 support and is the side-by-side NDK version from AGP.
+        ndkVersion = "23.1.7779620"
+    }
+    repositories {
+        google()
+        mavenCentral()
+    }
+    dependencies {
+        classpath("com.android.tools.build:gradle")
+        classpath("com.facebook.react:react-native-gradle-plugin")
+    }
+}
+---------- "android\gradle.properties" ---------- 
+# Project-wide Gradle settings.
+
+# IDE (e.g. Android Studio) users:
+# Gradle settings configured through the IDE *will override*
+# any settings specified in this file.
+
+# For more details on how to configure your build environment visit
+# http://www.gradle.org/docs/current/userguide/build_environment.html
+
+# Specifies the JVM arguments used for the daemon process.
+# The setting is particularly useful for tweaking memory settings.
+# Default value: -Xmx512m -XX:MaxMetaspaceSize=256m
+org.gradle.jvmargs=-Xmx2048m -XX:MaxMetaspaceSize=512m
+
+# When configured, Gradle will run in incubating parallel mode.
+# This option should only be used with decoupled projects. More details, visit
+# http://www.gradle.org/docs/current/userguide/multi_project_builds.html#sec:decoupled_projects
+# org.gradle.parallel=true
+
+# AndroidX package structure to make it clearer which packages are bundled with the
+# Android operating system, and which are packaged with your app's APK
+# https://developer.android.com/topic/libraries/support-library/androidx-rn
+android.useAndroidX=true
+# Automatically convert third-party libraries to use AndroidX
+android.enableJetifier=true
+
+# Version of flipper SDK to use with React Native
+FLIPPER_VERSION=0.182.0
+
+# Use this property to specify which architecture you want to build.
+# You can also override it from the CLI using
+# ./gradlew <task> -PreactNativeArchitectures=x86_64
+reactNativeArchitectures=armeabi-v7a,arm64-v8a,x86,x86_64
+
+# Use this property to enable support to the new architecture.
+# This will allow you to use TurboModules and the Fabric render in
+# your application. You should enable this flag either if you want
+# to write custom TurboModules/Fabric components OR use libraries that
+# are providing them.
+newArchEnabled=false
+
+# Use this property to enable or disable the Hermes JS engine.
+# If set to false, you will be using JSC instead.
+hermesEnabled=true
+---------- "android\settings.gradle" ---------- 
+rootProject.name = 'VersaPOS'
+apply from: file("../node_modules/@react-native-community/cli-platform-android/native_modules.gradle"); applyNativeModulesSettingsGradle(settings)
+include ':app'
+includeBuild('../node_modules/@react-native/gradle-plugin')
+---------- "App.tsx" ---------- 
+import React from 'react';
+import {SafeAreaView, StyleSheet, View} from 'react-native';
+
+import MainNavigator from './src/Rotas/MainNavigator';
+import { DebugProvider } from './src/Context/debugContext';
+import { EmpresaProvider } from './src/Context/empresaContext';
+import { UserProvider } from './src/Context/userContext';
+import { CarrinhoProvider } from './src/Context/carrinhoContext';
+import AppLow from './AppLow';
+
+function App(): JSX.Element {
+
+
+  const backgroundStyle = {
+    flex: 1,
+  
+  };
+
+  return (
+    <SafeAreaView style={backgroundStyle}>
+      
+      <DebugProvider>
+          <EmpresaProvider>
+            <UserProvider>
+              <CarrinhoProvider>
+                <View style={s.container}>
+                  <AppLow />
+                </View>
+              </CarrinhoProvider>
+            </UserProvider>
+          </EmpresaProvider>
+        </DebugProvider>
+    </SafeAreaView>
+  );
+}
+
+
+const s = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+});
+
+
+export default App;
+---------- "AppLow.tsx" ---------- 
+import { Alert, Linking } from 'react-native';
+import MainNavigator from './src/Rotas/MainNavigator';
+import { useUser } from './src/Context/userContext';
+import { useEmpresa } from './src/Context/empresaContext';
+import { useEffect, useState } from 'react';
+
+import { CadastroMovimentoPagamento } from './src/API/api_rotas';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import Rotas from './src/Rotas/Rotas';
+import { reset } from './src/Rotas/NavigatorContainerRef';
+
+function AppLow() {
+  const { empresa, setEmpresa } = useEmpresa();
+  const { user, setUser } = useUser();
+
+  const [contextoCarregado, setContextoCarregado] = useState(false);
+
+  // utilitário pequeno para parsear query string de deep links
+function parseDeepLinkParams(url: string) {
+  try {
+    // separa everything?query
+    const questionIndex = url.indexOf('?');
+    if (questionIndex === -1) return {};
+
+    const qs = url.substring(questionIndex + 1);
+    if (!qs) return {};
+
+    const pairs = qs.split('&');
+    const params: Record<string, string> = {};
+
+    for (const pair of pairs) {
+      if (pair === '') continue;
+      const [rawKey, ...rest] = pair.split('=');
+      const rawVal = rest.join('='); // permite valores que contenham '='
+      const key = decodeURIComponent(rawKey || '');
+      // alguns encodings usam '+' para espaço — substituímos antes do decode
+      const val = decodeURIComponent((rawVal || '').replace(/\+/g, ' '));
+      params[key] = val;
+    }
+
+    return params;
+  } catch (e) {
+    console.warn('parseDeepLinkParams error', e);
+    return {};
+  }
+}
+
+// extrai host/path do scheme, ex: reactnativeversapos://pay-response?...
+function getHostFromDeepLink(url: string) {
+  try {
+    const afterScheme = url.split('://')[1] || '';
+    const host = afterScheme.split(/[/?#]/)[0]; // pega até ? / ou #
+    return host;
+  } catch {
+    return '';
+  }
+}
+
+
+  async function restaurarContextos() {
+    try {
+      const storedUser = await AsyncStorage.getItem('@user');
+      const storedEmpresa = await AsyncStorage.getItem('@empresa');
+
+      if (storedUser) {
+        const parsedUser = JSON.parse(storedUser);
+        setUser(parsedUser);
+        // Alert.alert(
+        //   'restaurarContextos: user restaurado',
+        //   JSON.stringify(parsedUser),
+        // );
+      }
+
+      if (storedEmpresa) {
+        const parsedEmpresa = JSON.parse(storedEmpresa);
+        setEmpresa(parsedEmpresa);
+        // Alert.alert(
+        //   'restaurarContextos: empresa restaurada',
+        //   JSON.stringify(parsedEmpresa),
+        // );
+      }
+
+      setContextoCarregado(true);
+    } catch (error) {
+      Alert.alert(
+        'restaurarContextos: erro ao restaurar contextos:',
+        JSON.stringify(error),
+      );
+      setContextoCarregado(true); // evita travar app
+    }
+  }
+
+  async function gerarpagamento(params: any) {
+    // Alert.alert(
+    //   'Enviando essas informações para cadastromovimentopagamento: ',
+    //   JSON.stringify({
+    //     ...params,
+    //   }),
+    // );
+
+    const resultado = await CadastroMovimentoPagamento({
+      ...params,
+    });
+
+    if (resultado) {
+      return;
+    }
+    // Alert.alert('AppLow.tsx registro pagamento:', JSON.stringify(resultado));
+  }
+
+  useEffect(() => {
+    restaurarContextos();
+  }, []);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    if (!contextoCarregado) return;
+    // Função que processa o link recebido
+    const handleDeepLink = (event: { url: string }) => {
+      console.log('Processando link de retorno...');
+      console.log('Retorno recebido: ', event.url);
+
+      try {
+        const url = new URL(event.url) as any;
+        // const params = Object.fromEntries(url.searchParams);
+        const params = parseDeepLinkParams(event.url);
+
+        console.log('Parâmetros recebidos do deeplink:', params);
+        
+        // Se for retorno de impressão
+
+        const host = getHostFromDeepLink(event.url);
+        console.log("host: ", host)
+        if (host === 'print' || event.url.includes('/print') || event.url.includes('print')) {
+          
+          console.log('entrou no if!')
+
+          switch (params.DEEPLINK_RETURN) {
+            case 'SUCCESS':
+              Alert.alert('Impressão concluída com sucesso!');
+              break;
+            case 'PRINTER_OUT_OF_PAPER':
+              Alert.alert('Sem papel ou tampa aberta.');
+              break;
+            case 'PRINTER_INIT_ERROR':
+              Alert.alert('Erro ao inicializar impressora.');
+              break;
+            case 'PRINTER_LOW_ENERGY':
+              Alert.alert('Bateria fraca, não foi possível imprimir.');
+              break;
+            default:
+              Alert.alert('Erro na impressão:', params.DEEPLINK_RETURN || 'Desconhecido');
+          }
+
+          return;
+        }
+
+        console.log('Parâmetros pay-response:', params);
+
+        if (params.code === '0') {
+          Alert.alert('Pagamento aprovado!');
+          console.log('Pagamento aprovado!');
+
+          // const datamock  = {
+          //   "code": "0",
+          //   "amount": "100",
+          //   "success": "true",
+          //   "itk": "PB4M256B73665-3.14.0.14-sunmiSeriesP-T3VBSA-0005",
+          //   "type": "CRÉDITO",
+          //   "installment_count": "0",
+          //   "brand": "MASTERCARD",
+          //   "entry_mode": "PICC",
+          //   "atk": "38251082884092",
+          //   "pan": "550209****4337",
+          //   "order_id": "13000124",
+          //   "authorization_code": "884092",
+          //   "authorization_date_time": "09/10/2025 14:19:29"
+          // }
+
+          const [idmovimento, nummesa] = params.order_id.split('-');
+
+          gerarpagamento({
+            idusuario: user.usuario,
+            servername: user.servername,
+            serverport: user.serverport,
+            pathbanco: user.pathbanco,
+            idempresa: empresa?.idparametro,
+            ...params,
+            idformapagtodfe:
+              params.type === 'CRÉDITO'
+                ? '3'
+                : params.type === 'DÉBITO'
+                ? '4'
+                : params.type === 'PIX'
+                ? '17'
+                : '99',
+            order_id: idmovimento,
+          });
+
+          const dataenviar = new Date();
+
+          reset(Rotas.Mesa, {
+            idmovimento: idmovimento,
+            nummesa: nummesa,
+            data: `${dataenviar}`,
+            statusmesa: 'O',
+          });
+        } else {
+          Alert.alert(
+            'Falha no pagamento',
+            params.message || 'Erro desconhecido',
+          );
+          console.log(
+            'Falha no pagamento',
+            params.message || 'Erro desconhecido',
+          );
+        }
+      } catch (e) {
+        console.error('Erro ao processar retorno:', e);
+      }
+    };
+
+    // Adiciona listener para deep links
+    const subscription = Linking.addEventListener('url', handleDeepLink);
+
+    // Verifica se o app foi aberto por um deep link enquanto estava fechado
+    Linking.getInitialURL().then(url => {
+      if (url) {
+        handleDeepLink({ url });
+      }
+    });
+
+    // Limpeza do listener ao desmontar
+    return () => {
+      subscription.remove();
+    };
+  }, [contextoCarregado]);
+
+  return <MainNavigator />;
+}
+
+export default AppLow;
+---------- "package.json" ---------- 
+{
+  "name": "VersaPOS",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "android": "react-native run-android",
+    "ios": "react-native run-ios",
+    "lint": "eslint .",
+    "start": "react-native start",
+    "test": "jest"
+  },
+  "dependencies": {
+    "@react-native-async-storage/async-storage": "^2.2.0",
+    "@react-navigation/native": "^5.9.8",
+    "@react-navigation/stack": "^5.14.9",
+    "axios": "^1.12.2",
+    "react": "18.2.0",
+    "react-native": "0.72.4",
+    "react-native-gesture-handler": "^1.10.3",
+    "react-native-linear-gradient": "^2.5.6",
+    "react-native-safe-area-context": "^3.3.2",
+    "react-native-svg": "^13.11.0",
+    "react-native-vector-icons": "^9.2.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.20.0",
+    "@babel/preset-env": "^7.20.0",
+    "@babel/runtime": "^7.20.0",
+    "@react-native/eslint-config": "^0.72.2",
+    "@react-native/metro-config": "^0.72.11",
+    "@tsconfig/react-native": "^3.0.0",
+    "@types/react": "^18.0.24",
+    "@types/react-test-renderer": "^18.0.0",
+    "babel-jest": "^29.2.1",
+    "eslint": "^8.19.0",
+    "jest": "^29.2.1",
+    "metro-react-native-babel-preset": "0.76.8",
+    "prettier": "^2.4.1",
+    "react-test-renderer": "18.2.0",
+    "typescript": "4.8.4"
+  },
+  "engines": {
+    "node": ">=16"
+  }
+}
+---------- "src\API\api.js" ---------- 
+import axios from "axios";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Alert } from "react-native";
+
+let api;
+
+// URL padrão
+const DEFAULT_URL = "http://200.150.192.147:8085"
+
+// Função para inicializar cliente axios
+export async function getApi() {
+  if (!api) {
+    //### pega a URL salva ou usa a default
+    const savedUrl = await AsyncStorage.getItem("API_URL");
+    api = axios.create({
+      baseURL: savedUrl || DEFAULT_URL,
+      timeout: 5000,
+    });
+
+    //### interceptors (tratamento global de erros)
+    api.interceptors.response.use(
+      (response) => {
+    //### 🔹 Tratar erro mesmo com status 200
+    if (response?.data?.erro) {
+      if (response.data.erro !== 'Parcela(s) não encontrado(s).'){
+      Alert.alert("Resultado:", response.data.erro);}
+      return Promise.reject({ message: response.data.erro });
+    }
+
+    //### Caso a API mande erro em um array
+    if (Array.isArray(response.data) && response.data[0]?.erro) {
+      Alert.alert("", response.data[0].erro);
+      return Promise.reject({ message: response.data[0].erro });
+    }
+if (response?.data?.mensagem){
+  Alert.alert("mensagem: ", String(response?.data?.mensagem))
+}
+    
+
+    return response;},
+      (error) => {
+        
+        if (error.code === "ECONNABORTED") {
+          Alert.alert("Tempo de conexão excedido");
+          return Promise.reject({ message: "Tempo de conexão excedido" });
+        }
+        if (error.response) {
+          if (error.response.data?.erro){
+            Alert.alert("Resultado:", error.response.data?.erro)
+          }
+          else if (error.response.data[0]?.erro){
+            Alert.alert("Resultado:", error.response.data[0]?.erro)
+          }
+          else{
+          Alert.alert("Erro de conexão com o servidor:", JSON.stringify(error.response))
+          }
+          // console.log("Erro de conexão com o servidor: ", error.response)
+          return Promise.reject(error.response.data);
+        }
+        if (error?.message === "Network Error"){
+          Alert.alert("Erro de conexão com o servidor", "Verifique a disponibilidade de API")
+          return Promise.reject({ message: "Erro de conexão com o servidor" });
+        }
+
+        Alert.alert("Erro de conexão com o servidor:", JSON.stringify(error))
+        
+        
+        return Promise.reject({ message: "Erro de conexão com o servidor" });
+      }
+    );
+  }
+  return api;
+}
+
+// Função para atualizar URL da API
+export async function setApiUrl(newUrl) {
+
+  await AsyncStorage.setItem("API_URL", newUrl);
+  api = axios.create({
+    baseURL: newUrl || DEFAULT_URL,
+    timeout: 5000,
+  });
+}
+
+
+---------- "src\API\api_rotas.tsx" ---------- 
+import { getApi } from './api';
+
+export async function loginValidarAcesso(credentials: any) {
+  const api = await getApi();
+  const response = await api.post('/login/validaracesso', credentials);
+  return response;
+}
+
+export async function loginEfetuarLogin(credentials: any) {
+  const api = await getApi();
+  const response = await api.post('login/efetuarlogin', credentials);
+  return response;
+}
+
+export async function ConsultaParametros(credentials: any) {
+  const api = await getApi();
+  const response = await api.post('/consulta/parametros', credentials);
+  return response;
+}
+
+export async function MovimentoPesquisa(credentials: any) {
+  const api = await getApi();
+  const response = await api.post('/movimento/pesquisa', credentials);
+  return response;
+}
+
+export async function ConsultaFornecedor(credentials: any) {
+  const api = await getApi();
+  const response = await api.post('consulta/fornecedormovimento', credentials);
+  return response;
+}
+
+export async function ItemmovimentoPesquisaitemmovimentocomandas(
+  credentials: any,
+) {
+  const api = await getApi();
+  const response = await api.post(
+    '/itemmovimento/pesquisaitemmovimentocomandas',
+    credentials,
+  );
+  return response;
+}
+
+export async function ParcelaPesquisa(credentials: any) {
+  const api = await getApi();
+  const response = await api.post('/parcela/pesquisa', credentials);
+  return response;
+}
+
+
+export async function ConsultaMovimentoPagamento(credentials: any) {
+  const api = await getApi();
+  const response = await api.post('/consulta/movimentopagamento', credentials);
+  return response;
+}
+
+
+export async function CadastroMovimentoPagamento(credentials: any) {
+  const api = await getApi();
+  const response = await api.post('/cadastro/movimentopagamento', credentials);
+  return response;
+}
+
+
+export async function ConsultaGrupoProdutoMestre(credentials: any) {
+  const api = await getApi();
+  const response = await api.post('/consulta/grupoprodutomestre', credentials);
+  return response;
+}
+
+
+export async function ConsultaGrupoProduto(credentials: any) {
+  const api = await getApi();
+  const response = await api.post('/consulta/grupoproduto', credentials);
+  return response;
+}
+
+
+export async function ProdutoPesquisaMultiEstoque(credentials: any) {
+  const api = await getApi();
+  const response = await api.post('/produto/pesquisa', credentials);
+  return response;
+}
+
+export async function MovimentoCriarMesa(credentials: any) {
+  const api = await getApi();
+  const response = await api.post('/movimento/criarmesa', credentials);
+  return response;
+}
+
+export async function MovimentoInserirItensCarrinhoMesa(credentials: any) {
+  const api = await getApi();
+  const response = await api.post('/movimento/insereitenscarrinhomesa', credentials);
+  return response;
+}
+
+export async function ConsultaEstoquesVisivelVenda(credentials: any) {
+  const api = await getApi();
+  const response = await api.post('/consulta/estoques', credentials);
+  return response;
+}
+
+export async function ProdutoImagemProduto(credentials: any) {
+  const api = await getApi();
+  const response = await api.post('/produto/imagemproduto', credentials);
+  return response;
+}
+
+export async function ConsultaFornecedorParceiro(credentials: any) {
+  const api = await getApi();
+  const response = await api.post('/consulta/fornecedor', credentials);
+  return response;
+}
+
+export async function UpdateFornecedorMovimento(credentials: any) {
+  const api = await getApi();
+  const response = await api.post('/update/fornecedormovimento', credentials);
+  return response;
+}
+
+export async function RemoveItemMovimento(credentials: any) {
+  const api = await getApi();
+  const response = await api.post('/itemmovimento/removeitemmovimento', credentials);
+  return response;
+}
+
+
+
+
+
+// export async function loginUser(credentials) {
+//   const api = await getApi();
+//   return api.post("/auth/login", credentials);
+// }
+
+// export async function getUsers() {
+//   const api = await getApi();
+//   return api.get("/users");
+// }
+---------- "src\components\Button.tsx" ---------- 
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import colors from '../ThemeContext/colors';
+
+
+interface ButtonProps {
+    title?: string;
+    onPress?: () => void;
+    style?: any;
+}
+
+const ButtonCustom = ({title, onPress = () => {}, style}: ButtonProps) => {
+
+  
+
+  return (
+    <View>
+      <TouchableOpacity onPress={() => onPress()} style={[s.buttonMain, style]}>
+        <Text style={[s.buttonText, style?.color && {color: style.color}]}>{title}</Text>
+      </TouchableOpacity>
+    </View>
+  );
+};
+
+const s = StyleSheet.create({
+  buttonMain: {
+    marginHorizontal: 10,
+    backgroundColor: colors.AzulClaro,
+    padding: 8,
+    borderRadius: 10
+    
+  },
+  buttonText: {
+    color: "white",
+    textAlign: "center",
+    fontSize: 16
+  },
+  
+})
+
+export { ButtonCustom };
+---------- "src\components\Cabecalho.tsx" ---------- 
+import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import colors from "../ThemeContext/colors";
+import CardVoltar from "./CardVoltar";
+
+interface CabecalhoType{
+    showdebug?: string;
+    voltarFunction: (value: any) => void;
+}
+
+const Cabecalho = ({voltarFunction, showdebug}: CabecalhoType) =>{
+
+    return(
+        <View style={s.Header}>
+         
+        <TouchableOpacity
+          onPress={voltarFunction}
+          style={s.cardVoltar}
+        >
+          <CardVoltar />
+        </TouchableOpacity>
+        <View>
+        <Image
+          style={s.logoImage}
+          source={require('../assets/Images/VersaPOSlogo.png')}
+          resizeMode="contain"
+        />
+        {showdebug && <Text style={s.showdebug}>{showdebug}</Text>}
+        </View>
+      </View>
+    )
+}
+
+const s = StyleSheet.create({
+  Header: {
+    width: '100%',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    borderBottomColor: colors.CinzaClaro,
+    borderBottomWidth: 1,
+  },
+  logoImage: {
+    width: 200,
+    height: 60,
+  },
+  cardVoltar: {
+    position: 'absolute',
+    left: 0,
+    alignSelf: 'center',
+  },
+  showdebug: {
+    color: "red"
+  }
+});
+
+
+export default Cabecalho;---------- "src\components\CardImprimirConta.tsx" ---------- 
+import {
+  Alert,
+  Image,
+  Linking,
+  StyleSheet,
+  TouchableOpacity,
+} from 'react-native';
+import LinearGradient from 'react-native-linear-gradient';
+
+const CardImprimirConta = ({ info }: any) => {
+  const returnScheme = 'reactnativeversapos'; // igual ao AndroidManifest
+
+  function formatarValor(valor: number) {
+    return valor?.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+  }
+
+  async function imprimirConta() {
+    try {
+      const agora = new Date();
+      const dataStr = agora.toLocaleString('pt-BR', {
+        dateStyle: 'short',
+        timeStyle: 'short',
+      });
+
+      //----------------------------------------------------------
+      let content = [
+        {
+          type: 'text',
+          content: '==================================',
+          align: 'center',
+          size: 'medium',
+        },
+        {
+          type: 'text',
+          content: 'CONTA PARCIAL DA MESA - PDV',
+          align: 'center',
+          size: 'medium',
+        },
+        {
+          type: 'text',
+          content: `Mesa: ${info.mesa}`,
+          align: 'left',
+          size: 'medium',
+        },
+        {
+          type: 'text',
+          content: `Impresso por ${info.idusuario}`,
+          align: 'left',
+          size: 'medium',
+        },
+        {
+          type: 'text',
+          content: `Impressão: ${dataStr}`,
+          align: 'left',
+          size: 'medium',
+        },
+        {
+          type: 'text',
+          content: `Abertura: ${info.abertura}`,
+          align: 'left',
+          size: 'medium',
+        },
+        {
+          type: 'text',
+          content: `Permanência: ${info.utilizacao}`,
+          align: 'left',
+          size: 'medium',
+        },
+        {
+          type: 'text',
+          content: `Garçom: ${info.garcom}`,
+          align: 'left',
+          size: 'medium',
+        },
+        {
+          type: 'text',
+          content: '==================================',
+          align: 'center',
+          size: 'medium',
+        },
+        {
+          type: 'text',
+          content: 'Produto     Qtd x Unit      Total',
+          align: 'center',
+          size: 'medium',
+        },
+      ];
+
+      for (const item of info.itens) {
+        const nome = item.nomeproduto?.toUpperCase();
+        const qtd = item.quantidade?.toFixed(3).replace('.000', '');
+        const precoUnit = formatarValor(item.precooriginal);
+        const totalItem = formatarValor(item.totalitem);
+
+        // Linha principal do produto
+        const linhaPrincipal = `${nome?.substring(
+          0,
+          20,
+        )} ${qtd} x ${precoUnit} = R$ ${totalItem}`;
+
+        content.push({
+          type: 'text',
+          content: linhaPrincipal,
+          align: 'left',
+          size: 'small',
+        });
+
+        // Se o nome for longo (mais de 23 caracteres), divide em duas linhas
+        // if (nome?.length > 15) {
+        //   const restante = nome.substring(15);
+
+        //   content.push({
+        //     type: 'text',
+        //     content: restante,
+        //     align: 'left',
+        //     size: 'small',
+        //   });
+        // }
+      }
+
+      content.push({
+        type: 'text',
+        content: '==================================',
+        align: 'center',
+        size: 'medium',
+      });
+
+      content.push({
+        type: 'text',
+        content: `(=) Subtotal: R$ ${Number(
+          info.itens.reduce(
+            (acc: any, item: any) => acc + (item.totalitem || 0),
+            0,
+          ),
+        ).toFixed(2)}`,
+        align: 'left',
+        size: 'medium',
+      });
+
+      content.push({
+        type: 'text',
+        content: `(+) Taxa garçom: R$ ${formatarValor(info.taxa)}`,
+        align: 'left',
+        size: 'medium',
+      });
+
+      content.push({
+        type: 'text',
+        content: '==================================',
+        align: 'center',
+        size: 'medium',
+      });
+
+      content.push({
+        type: 'text',
+        content: `(=) Total: R$ ${formatarValor(info.total)}`,
+        align: 'left',
+        size: 'medium',
+      });
+
+      // Transforma em JSON string
+      const conteudoJson = JSON.stringify(content);
+
+      // Codifica para URL
+      const conteudoEncoded = encodeURIComponent(conteudoJson);
+      // const conteudoEncoded = encodeURIComponent(JSON.stringify([{type: 'text', content: "TESTE", align: "right", size: "medium"}]));
+
+      // Monta deeplink
+      let url = 'printer-app://print?';
+      url += 'SHOW_FEEDBACK_SCREEN=true';
+      url += `&SCHEME_RETURN=${returnScheme}`;
+      url += `&PRINTABLE_CONTENT=${conteudoEncoded}`;
+
+      console.log('Enviando para impressora:', JSON.stringify(url));
+      await Linking.openURL(url);
+    } catch (err) {
+      console.log('Erro ao enviar impressão:', err);
+      Alert.alert('Erro ao enviar impressão', String(err));
+    }
+  }
+
+  return (
+    <LinearGradient colors={['#2A64D0', '#99B0DC']} style={s.cardRight}>
+      <TouchableOpacity onPress={imprimirConta}>
+        <Image
+          style={s.imageRight}
+          source={require('../assets/Images/icon_imprimir.png')}
+        />
+      </TouchableOpacity>
+    </LinearGradient>
+  );
+};
+
+const s = StyleSheet.create({
+  cardRight: {
+    width: '33.1%',
+    justifyContent: 'center',
+    padding: 10,
+  },
+  imageRight: {
+    width: 40,
+    height: 40,
+    alignSelf: 'center',
+  },
+});
+
+export default CardImprimirConta;
+---------- "src\components\CardItemMovimento.tsx" ---------- 
+// import { faWarning } from '@fortawesome/free-solid-svg-icons';
+// import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import React, { useState } from 'react';
+import { Modal } from 'react-native';
+
+const CardItemMovimento = ({
+  itemmovimento,
+  onPressExcluir,
+}: {
+  itemmovimento: any;
+  onPressExcluir?: (iditemmovimento: any) => void;
+}) => {
+  function formatTime(isoString: any) {
+    const date = new Date(isoString);
+    const hours = date.getUTCHours().toString().padStart(2, '0');
+    const minutes = date.getUTCMinutes().toString().padStart(2, '0');
+    return `${hours}:${minutes}`;
+  }
+
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [itemToDelete, setItemToDelete] = useState<any>(null);
+
+  return (
+    <View style={s.MainView}>
+      <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+        <Text style={{ color: '#7392CD', fontWeight: 'bold', width: '80%' }}>
+          {itemmovimento.quantidade
+            .toFixed(3)
+            .replace('.', ',')
+            .replace(',000', '')}
+          x {itemmovimento.nomeproduto}
+        </Text>
+
+        <View style={{ flexDirection: 'row' }}>
+          <Image
+            alt={'relogio'}
+            style={{
+              width: 15,
+              height: 15,
+              marginRight: 2,
+              alignSelf: 'center',
+            }}
+            source={require('../assets/Images/icon_utilizacao.png')}
+          />
+
+          <Text style={{ color: '#7392CD' }}>
+            {formatTime(itemmovimento.datainc)}
+          </Text>
+        </View>
+      </View>
+
+      <View
+        style={{
+          marginTop: 10,
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+        }}
+      >
+        <View
+          style={{
+            justifyContent: 'space-between',
+            padding: 2,
+            flexDirection: 'row',
+            borderRadius: 20,
+            borderWidth: 1,
+            borderColor: '#E6E6E6',
+            width: '48%',
+          }}
+        >
+          <View
+            style={{
+              borderRadius: 20,
+              backgroundColor: '#EEEEEE',
+              width: '40%',
+            }}
+          >
+            <Text
+              style={{
+                color: '#74747B',
+                fontWeight: 'bold',
+                alignSelf: 'center',
+              }}
+            >
+              {' '}
+              {itemmovimento.siglaunimedida}
+            </Text>
+          </View>
+
+          <Text
+            style={{ fontWeight: 'bold', color: '#74747B', marginRight: 3 }}
+          >
+            R${' '}
+            {String(itemmovimento.precooriginal.toFixed(2)).replace('.', ',')}
+          </Text>
+        </View>
+
+        <View
+          style={{
+            justifyContent: 'space-between',
+            padding: 2,
+            flexDirection: 'row',
+            borderRadius: 20,
+            borderWidth: 1,
+            borderColor: '#E6E6E6',
+            width: '48%',
+          }}
+        >
+          <View
+            style={{
+              borderRadius: 20,
+              backgroundColor: '#EEEEEE',
+              width: '40%',
+            }}
+          >
+            <Text
+              style={{
+                color: '#74747B',
+                fontWeight: 'bold',
+                alignSelf: 'center',
+              }}
+            >
+              Total
+            </Text>
+          </View>
+
+          <Text
+            style={{ fontWeight: 'bold', color: '#74747B', marginRight: 3 }}
+          >
+            R$ {String(itemmovimento.totalitem.toFixed(2)).replace('.', ',')}
+          </Text>
+        </View>
+      </View>
+
+      {itemmovimento.descricaoitemmovimento && (
+        <>
+          {/* <FontAwesomeIcon icon={faWarning as any} color={'#dd5353ff'} /> */}
+          <Text
+            style={{
+              backgroundColor: '#edf0faff',
+              borderRadius: 10,
+              padding: 10,
+              color: '#e49338ff',
+            }}
+          >
+            {itemmovimento.descricaoitemmovimento}
+          </Text>
+        </>
+      )}
+
+      <View
+        style={{
+          marginTop: 10,
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+        }}
+      >
+        <View style={{ flexDirection: 'row' }}>
+          <Image
+            alt={'icon_garcomcinza'}
+            style={{ width: 25, height: 25 }}
+            source={require('../assets/Images/icon_garcomcinza.png')}
+          />
+          <Text
+            style={{
+              marginLeft: 2,
+              color: '#74747B',
+              fontSize: 18,
+              textAlign: 'center',
+            }}
+          >
+            Garçom:
+          </Text>
+          <Text
+            style={{
+              marginLeft: 1,
+              color: '#74747B',
+              fontWeight: 'bold',
+              fontSize: 18,
+            }}
+          >
+            {itemmovimento.usuarioinc}
+          </Text>
+        </View>
+
+        <TouchableOpacity onPress={() => {}}>
+          <Image
+            style={{ width: 20, height: 20, marginLeft: 2, marginTop: 1 }}
+            alt="ImgProduto"
+            source={require('../assets/Images/icon_Observacao.png')}
+          />
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          onPress={() => {
+            setItemToDelete(itemmovimento.iditemmovimento);
+            setShowConfirm(true);
+          }}
+        >
+          <Image
+            alt={'icon_lixeira'}
+            style={{ width: 25, height: 25 }}
+            source={require('../assets/Images/icon_lixeira.png')}
+          />
+        </TouchableOpacity>
+      </View>
+
+      <Modal
+        visible={showConfirm}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setShowConfirm(false)}
+      >
+        <View
+          style={{
+            flex: 1,
+            backgroundColor: 'rgba(0,0,0,0.5)',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+        >
+          <View
+            style={{
+              backgroundColor: 'white',
+              borderRadius: 10,
+              padding: 20,
+              width: '80%',
+            }}
+          >
+            <Text
+              style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 10 }}
+            >
+              Deseja realmente excluir este item?
+            </Text>
+
+            <View
+              style={{ flexDirection: 'row', justifyContent: 'space-between' }}
+            >
+              <TouchableOpacity
+                style={{
+                  backgroundColor: '#E6E6E6',
+                  padding: 10,
+                  borderRadius: 10,
+                  width: '45%',
+                  alignItems: 'center',
+                }}
+                onPress={() => setShowConfirm(false)}
+              >
+                <Text>Cancelar</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={{
+                  backgroundColor: '#dd5353',
+                  padding: 10,
+                  borderRadius: 10,
+                  width: '45%',
+                  alignItems: 'center',
+                }}
+                onPress={() => {
+                  if (onPressExcluir) onPressExcluir(itemToDelete);
+                  setShowConfirm(false);
+                }}
+              >
+                <Text style={{ color: 'white' }}>Excluir</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+    </View>
+  );
+};
+
+const s = StyleSheet.create({
+  MainView: {
+    marginTop: 3,
+    backgroundColor: 'white',
+    marginHorizontal: 20,
+    borderRadius: 20,
+    borderBottomWidth: 3,
+    borderBottomColor: '#7392CD',
+    padding: 5,
+  },
+});
+
+export default CardItemMovimento;
+---------- "src\components\CardItensMovimento.tsx" ---------- 
+import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import LinearGradient from 'react-native-linear-gradient';
+import CardItemMovimento from './CardItemMovimento';
+
+
+interface CardItensMovimentoProps{
+    itensmovimento: any[];
+    onPressLupa?: () => void;
+    onPressAddItem?: () => void;
+    onPressExcluir?: (iditemmovimento: any) => void;
+}
+
+const CardItensMovimento = ({ itensmovimento, onPressLupa, onPressAddItem, onPressExcluir}: CardItensMovimentoProps ) => {
+
+
+  return (
+    <View style={s.MainView}>
+      <LinearGradient colors={['#2A64D0', '#99B0DC']} style={s.LinarGradient} />
+      <View style={s.ViewBodyCard}>
+        <Image
+          alt={'icon_listaitensmovimento'}
+          style={s.imageListaItens}
+          source={require('../assets/Images/icon_listaitensmovimento.png')}
+        />
+        <View style={s.ViewTotalPesquisaInserir}>
+          <View style={s.ViewTotalItens}>
+            <Text style={s.TotalItens}>
+              R${' '}
+              {String(
+                Number(
+                  itensmovimento.reduce(
+                    (acc: any, item: any) => acc + (item.totalitem || 0),
+                    0,
+                  ),
+                ).toFixed(2),
+              ).replace('.', ',')}{' '}
+            </Text>
+          </View>
+
+              {onPressLupa &&
+          <TouchableOpacity onPress={onPressLupa}>
+            <Image
+              alt={'pesquisar_movimentos'}
+              source={require('../assets/Images/pesquisar_movimentos.png')}
+              style={s.imagePesquisaMovimentos}
+            />
+          </TouchableOpacity>}
+
+          <TouchableOpacity onPress={onPressAddItem}>
+          <Image
+            alt={'icon_adicionar'}
+            source={require('../assets/Images/icon_adicionar.png')}
+            style={s.imageAdicionarItens}
+          />
+          </TouchableOpacity>
+        </View>
+        {itensmovimento.map((item: any, index: any) => (
+            <View key={index} style={s.ViewItemMovimento}>
+          <CardItemMovimento itemmovimento={item} onPressExcluir={onPressExcluir}/>
+          </View>
+        ))}
+
+        <View style={{height: 300}}></View>
+      </View>
+    </View>
+  );
+};
+
+const s = StyleSheet.create({
+  MainView: {},
+  LinarGradient: {
+    height: 55,
+    marginTop: 10,
+    borderTopLeftRadius: 25,
+    borderTopRightRadius: 25,
+  },
+  ViewBodyCard: {
+    borderRightColor: 'grey',
+    borderLeftColor: 'grey',
+    borderRightWidth: 1,
+    borderBottomColor: 'grey',
+    borderBottomWidth: 1,
+    borderLeftWidth: 1,
+  },
+  imageListaItens: {
+    alignSelf: 'center',
+    width: 50,
+    height: 50,
+    marginTop: -25,
+  },
+  ViewTotalPesquisaInserir: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingHorizontal: 10,
+    marginTop: 5,
+  },
+  ViewTotalItens: {
+    backgroundColor: 'white',
+    padding: 5,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: '#c0c0c0ff',
+    marginVertical: 10,
+    justifyContent: 'center',
+  },
+  TotalItens: {
+    color: '#c0c0c0ff',
+    fontWeight: 'bold',
+  },
+  imagePesquisaMovimentos: { width: 40, height: 40 },
+  imageAdicionarItens: { width: 40, height: 40 },
+  ViewItemMovimento: {
+    marginVertical: 5
+  }
+});
+
+export default CardItensMovimento;
+---------- "src\components\CardMesa.tsx" ---------- 
+import { View, Text, Image, StyleSheet } from 'react-native';
+import LinearGradient from 'react-native-linear-gradient';
+
+interface InputProps {
+  mesa: any;
+}
+
+export default function CardMesa({ mesa }: InputProps) {
+  
+  const cor_ocupada: string[] = ['#FE546A', '#EE8795'];
+  const cor_reservada: string[] = ['#FFA54D', '#FDCD9E'];
+  const cor_livre: string[] = ['#21C55C', '#51FF8F'];
+
+  return (
+    <View style={s.mainview}>
+      {mesa.mesafechada === 'S' && (
+        <View style={s.fechamento}>
+          <Text style={s.textfechamento}>fechamento</Text>
+        </View>
+      )}
+
+      <View style={s.container}>
+        <View style={s.imageview}>
+          {mesa.statusmesa === 'O' ? (
+            <>
+              <Image
+                style={s.image}
+                alt={'card_mesa'}
+                source={require('../assets/Images/mesa_ocupada.png')}
+              />
+            </>
+          ) : (
+            <></>
+          )}
+
+          {mesa.statusmesa === 'R' ? (
+            <>
+              <Image
+                style={s.image}
+                alt={'card_mesa'}
+                source={require('../assets/Images/mesa_reservada.png')}
+              />
+            </>
+          ) : (
+            <></>
+          )}
+
+          {mesa.statusmesa === 'L' ? (
+            <>
+              <Image
+                style={s.image}
+                alt={'card_mesa'}
+                source={require('../assets/Images/mesa_livre.png')}
+              />
+            </>
+          ) : (
+            <></>
+          )}
+        </View>
+
+        {mesa.funcionario && (
+          <View style={s.viewfuncionario}>
+            <Text style={s.textfuncionario}>{mesa.funcionario}</Text>
+          </View>
+        )}
+      </View>
+      <View>
+        <LinearGradient
+          // Backgro3und Linear Gradient
+          colors={
+            mesa.statusmesa === 'O'
+              ? cor_ocupada
+              : mesa.statusmesa === 'R'
+              ? cor_reservada
+              : cor_livre
+          }
+          style={s.lineargradient}
+        >
+          <Text style={s.textnummesa}>{mesa.nummesa}</Text>
+        </LinearGradient>
+      </View>
+    </View>
+  );
+}
+
+const s = StyleSheet.create({
+  fechamento: {
+    position: 'absolute',
+    width: '100%',
+    backgroundColor: '#e99629ff',
+    zIndex: 10,
+    borderTopRightRadius: 10,
+    borderTopLeftRadius: 10,
+  },
+  textfechamento: {
+    width: '100%',
+    textAlign: 'center',
+    color: 'white',
+  },
+  mainview: {
+    width: 130,
+    height: 130,
+  },
+  container: {
+    backgroundColor: 'white',
+    borderTopLeftRadius: 15,
+    borderTopRightRadius: 15,
+    borderBottomWidth: 0,
+    width: 130,
+    borderLeftWidth: 1,
+    borderRightWidth: 1,
+    borderTopWidth: 1,
+    borderTopColor: '#eeededff',
+    borderRightColor: '#eeededff',
+    borderLeftColor: '#eeededff',
+    borderBottomColor: 'red.300',
+    height: 100,
+  },
+  imageview: {
+    justifyContent: 'center',
+    width: '100%',
+    height: '100%',
+    alignItems: 'center',
+    flexDirection: 'row',
+  },
+  image: { width: 80, height: 80, flexDirection: 'column' },
+  viewfuncionario: {
+    bottom: 0,
+    position: 'absolute',
+    justifyContent: 'center',
+    width: '100%',
+  },
+  textfuncionario: { color: '#e2dbdbff', alignSelf: 'center' },
+  lineargradient: {
+    left: 0,
+    right: 0,
+    top: 0,
+    height: 30,
+    width: 130,
+    borderBottomRightRadius: 15,
+    borderBottomLeftRadius: 15,
+    backgroundColor: '#FE546A',
+  },
+  textnummesa: { alignSelf: 'center', color: 'white', fontSize: 18 },
+});
+---------- "src\components\CardMesaDispon�vel.tsx" ---------- 
+---------- "src\components\CardNumMesa.tsx" ---------- 
+import {  Image, StyleSheet, Text, View } from 'react-native';
+
+
+
+
+interface InputProps {
+
+    mesa: any
+
+}
+
+export default function CardNumMesa({ mesa }: InputProps) {
+
+    const cor_ocupada = ['#EE8795', '#D13E52']
+    const cor_reservada = ['#FDCD9E', '#FFA54D']
+    const cor_livre = ['#21C55C', '#51FF8F']
+
+    
+    return (
+        <View style={{
+                backgroundColor: mesa.statusmesa == 'O' ? cor_ocupada[0] : mesa.statusmesa == 'R' ? cor_reservada[0] : cor_livre[0],
+                borderRadius: 6,
+                width: 160,
+                borderColor: mesa.statusmesa == 'O' ? cor_ocupada[1] : mesa.statusmesa == 'R' ? cor_reservada[1] : cor_livre[1],
+                height: 55,
+                borderWidth: 2,
+                justifyContent: "center",
+                alignItems: "center",
+                flexDirection: "row",
+                paddingHorizontal: 3
+            }}
+            >
+
+            
+                {mesa.statusmesa == 'O' ? <><Image
+                    style={{ width: 40, height: 40, flexDirection: "column" }}
+
+                    alt={"card_mesa"}
+                    source={require("../assets/Images/mesa_ocupada.png")} /></> : <></>}
+
+
+                {mesa.statusmesa == 'R' ? <><Image
+                    style={{ width: 40, height: 40, flexDirection: 'column' }}
+
+                    alt={"card_mesa"}
+                    source={require("../assets/Images/mesa_reservada.png")} /></> : <></>}
+
+
+                {mesa.statusmesa == 'L' ? <><Image
+                    style={{ width: 40, height: 40, flexDirection: 'column' }}
+
+                    alt={"card_mesa"}
+                    source={require("../assets/Images/mesa_livre.png")} /></> : <></>}
+
+                <View style={{ marginLeft: 4, marginRight: 5, flexDirection: "row", alignItems: "center", }}>
+                    <Text style={s.TextMesa} >Mesa</Text>
+                    <Text style={s.TextMesa2} > {mesa.nummesa}</Text>
+                </View>
+
+        </View>
+    )
+}
+
+
+const s = StyleSheet.create({
+    TextMesa: {
+        fontSize: 18,
+        fontWeight: "bold",
+        color: "white"
+    },
+    TextMesa2:{
+        fontSize: 20,
+        fontWeight: "bold",
+        color: "white"
+
+    }
+})---------- "src\components\CardParceiro.tsx" ---------- 
+
+
+import { View,Image,Text, StyleSheet } from "react-native"
+
+
+
+export default function CardParceiro(){
+    
+
+
+    return (
+        <View>
+                
+
+
+            <View  style={{ borderRadius:6,   width:160,   borderColor:"#7392CD",   height:55,   borderWidth:2,   justifyContent:"center",   alignItems:"center",    flexDirection:"row",    paddingHorizontal:3,  }}
+             >
+
+
+<Image
+                style={{ width: 35, height: 20, flexDirection: "column" }}
+                
+                alt={"icon_parceiro"}
+                source={require("../assets/Images/icon_parceiro.png")}
+                 />
+
+
+            <Text style={s.TextParceiro} >Parceiro</Text>
+            </View>
+       
+        </View>
+    )
+}
+
+
+const s = StyleSheet.create({
+    TextParceiro:{
+        marginLeft: 5,
+        alignSelf: "center",
+        color: "#7392CD",
+        fontWeight: "bold",
+        fontSize: 15
+    }
+})---------- "src\components\CardParceiroSelecionado.tsx" ---------- 
+import { StyleSheet, View, Text, Image } from 'react-native';
+
+interface FornecedorType {
+  nome: string;
+  tipofornecedor: string;
+  cnpj: string;
+}
+
+interface FornecedorCard{
+    fornecedor: FornecedorType
+}
+
+export default function CardParceiroSelecionado({ fornecedor  }: FornecedorCard) {
+  return (
+    <View>
+      <View style={s.MainView}>
+        <Image
+          style={s.image}
+          alt={'icon_parceiro_branco'}
+          source={require('../assets/Images/icon_parceiro_branco.png')}
+        />
+
+        <View style={s.View2}>
+          <Text numberOfLines={2} style={s.FornNome}>{fornecedor.nome}</Text>
+          <Text style={s.FornTipo}>
+            {fornecedor.tipofornecedor === 'J' ? 'CNPJ:' : 'CPF:'}{' '}
+            {fornecedor.cnpj}
+          </Text>
+        </View>
+      </View>
+    </View>
+  );
+}
+
+const s = StyleSheet.create({
+  FornNome: {
+    marginRight: 1,
+    color: 'white',
+    fontWeight: 'bold',
+    fontSize: 10,
+    maxWidth: "70%",
+    textAlign: "center"
+  },
+  FornTipo: { marginRight: 1, color: 'white', fontWeight: 'bold', fontSize: 9 },
+  View2: { marginLeft: 1 },
+  MainView: {
+    borderRadius: 6,
+    width: 160,
+    backgroundColor: '#7392CD',
+    height: 55,
+    justifyContent: 'center',
+    alignItems: 'center',
+    flexDirection: 'row',
+    paddingHorizontal: 3,
+  },
+  image: { width: 35, height: 20, flexDirection: 'column', marginRight: 5 },
+});
+---------- "src\components\CardProdutoInserirCarrinho.tsx" ---------- 
+import React, { useEffect, useState } from 'react';
+import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useCarrinho } from '../Context/carrinhoContext';
+import { useUser } from '../Context/userContext';
+import { useEmpresa } from '../Context/empresaContext';
+import { ProdutoImagemProduto } from '../API/api_rotas';
+
+const ProdutoCardCarrinho = React.memo(({ produto }: { produto: any }) => {
+  const { setCarrinho } = useCarrinho();
+
+  async function handleAdd() {
+    setCarrinho(prev => {
+      return prev.map(item =>
+        item.idproduto === produto.idproduto
+          ? {
+              ...item,
+              quantidade: item.quantidade + 1,
+            }
+          : item,
+      );
+    });
+  }
+
+  async function handleRemove() {
+    setCarrinho(prev =>
+      prev.reduce((acc, item) => {
+        if (item.idproduto === produto.idproduto) {
+          if (item.quantidade > 1) {
+            // Diminui 1 unidade
+            acc.push({ ...item, quantidade: item.quantidade - 1 });
+          }
+          // Se tiver 1 unidade, simplesmente não adiciona (ou seja, remove)
+        } else {
+          // Mantém os outros produtos normalmente
+          acc.push(item);
+        }
+        return acc;
+      }, [] as typeof prev),
+    );
+  }
+
+  const [imagemBanco, setImagemBanco] = useState('');
+  const { user } = useUser();
+  const { empresa } = useEmpresa();
+  useEffect(() => {
+    async function fetchImagem() {
+      const servername = user.servername;
+      const serverport = user.serverport;
+      const pathbanco = user.pathbanco;
+      const idempresa = empresa?.idparametro;
+
+      if (produto.imagemcadastro) {
+        const resultado = await ProdutoImagemProduto({
+          servername,
+          serverport,
+          pathbanco,
+          idproduto: produto.idproduto,
+          idempresa,
+        });
+        console.log('resultado: ', JSON.stringify(resultado));
+        if (resultado.data?.imagem) {
+          setImagemBanco(`data:image/png;base64,${resultado.data?.imagem}`);
+        }
+      } else {
+      }
+    }
+    fetchImagem();
+  }, [produto.imagemcadastro]);
+
+  return (
+    <View style={styles.mainview}>
+      <View style={styles.view1}>
+        <Image
+          style={styles.image}
+          alt="ImgProduto"
+          source={
+            imagemBanco
+              ? {
+                  uri:
+                    imagemBanco ||
+                    'https://cdn-icons-png.freepik.com/256/5544/5544155.png',
+                }
+              : require('../assets/Images/ProdutoSemImagem.png')
+          }
+          borderRadius={15}
+        />
+      </View>
+
+      <View style={styles.view2}>
+        <Text style={styles.textdescricao}>{produto.descricao}</Text>
+
+        <TouchableOpacity onPress={() => {}}>
+          <View style={styles.view3}>
+            <View style={styles.view4}>
+              <Text style={styles.textobservacao}>
+                {produto.observacoes
+                  ? produto.observacoes
+                  : 'Adicionar observações...'}
+              </Text>
+            </View>
+
+            <Image
+              style={styles.view5}
+              alt="ImgProduto"
+              source={require('../assets/Images/icon_Observacao.png')}
+            />
+          </View>
+        </TouchableOpacity>
+
+        <View style={styles.view6}>
+          <Text style={styles.textprecovenda}>
+            R$ {String(produto.precovenda.toFixed(2)).replace('.', ',')}
+          </Text>
+
+          <View style={styles.view7}>
+            <TouchableOpacity
+              onPress={() => {
+                handleRemove();
+              }}
+            >
+              <Image
+                style={styles.image1}
+                alt="ImgProduto"
+                source={require('../assets/Images/icon_botaoMenos.png')}
+              />
+            </TouchableOpacity>
+            <Text style={styles.textquantidade}>{produto.quantidade}</Text>
+            <TouchableOpacity
+              onPress={() => {
+                handleAdd();
+              }}
+            >
+              <Image
+                style={styles.image1}
+                alt="ImgProduto"
+                source={require('../assets/Images/icon_botaoMais.png')}
+              />
+            </TouchableOpacity>
+          </View>
+
+          {/* <Button onPress={handleRemove}>-</Button>
+          <Text mx={2}>{quantidade}</Text>
+          <Button onPress={handleAdd}>+</Button> */}
+        </View>
+      </View>
+    </View>
+  );
+});
+
+const styles = StyleSheet.create({
+  mainview: {
+    flexDirection: 'row',
+    backgroundColor: 'white',
+    alignSelf: 'center',
+    borderRadius: 15,
+    paddingLeft: 2,
+    marginTop: 5,
+    width: '90%',
+    height: 125,
+    borderWidth: 1,
+    borderColor: '#EEEEEE',
+  },
+  view1: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: '100%',
+  },
+  image: {
+    width: 100,
+    height: 100,
+    backgroundColor: '#E9E9E9',
+    marginRight: 3,
+  },
+  view2: { width: '65%', justifyContent: 'space-between' },
+  textdescricao: {
+    fontWeight: 'bold',
+    color: '#2A64D0',
+    fontSize: 14,
+    maxHeight: 50,
+  },
+  view3: { flexDirection: 'row', justifyContent: 'space-around' },
+  view4: {
+    width: '78%',
+    height: 30,
+    borderColor: '#BDBEC0',
+    borderRadius: 5,
+    borderWidth: 1,
+  },
+  textobservacao: { color: '#BDBEC0', marginLeft: 3 },
+  view5: {
+    width: 20,
+    height: 20,
+    marginLeft: 2,
+    marginTop: 1,
+    alignSelf: 'center',
+  },
+  textprecovenda: { fontWeight: 'bold', color: '#2A64D0', fontSize: 28 },
+  view6: { flexDirection: 'row', justifyContent: 'space-between' },
+  image1: {
+    width: 25,
+    height: 25,
+    opacity: 0.5,
+    alignSelf: 'center',
+    justifyContent: 'center',
+    marginBottom: 3,
+    borderRadius: 8,
+  },
+  textquantidade: {
+    marginTop: -2,
+    color: '#2A64D0',
+    fontSize: 25,
+    marginHorizontal: 3,
+  },
+  view7: { flexDirection: 'row', paddingRight: 10 },
+});
+
+export default ProdutoCardCarrinho;
+---------- "src\components\CardProdutoInserirMesa.tsx" ---------- 
+import React, { useEffect, useState } from 'react';
+import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import colors from '../ThemeContext/colors';
+import { ProdutoImagemProduto } from '../API/api_rotas';
+import { useUser } from '../Context/userContext';
+import { useEmpresa } from '../Context/empresaContext';
+
+const ProdutoCard = React.memo(
+  ({
+    produto,
+    handleInsert,
+  }: {
+    produto: any;
+    handleInsert: (produto: any, quantidade: number) => void;
+  }) => {
+    const [imagemBanco, setImagemBanco] = useState('');
+    const { user } = useUser();
+    const { empresa } = useEmpresa();
+
+    useEffect(() => {
+      async function fetchImagem() {
+        const servername = user.servername;
+        const serverport = user.serverport;
+        const pathbanco = user.pathbanco;
+        const idempresa = empresa?.idparametro;
+
+        if (produto.imagemcadastro) {
+          const resultado = await ProdutoImagemProduto({
+            servername,
+            serverport,
+            pathbanco,
+            idproduto: produto.idproduto,
+            idempresa,
+          });
+          console.log('resultado: ', JSON.stringify(resultado));
+          if (resultado.data?.imagem) {
+            setImagemBanco(`data:image/png;base64,${resultado.data?.imagem}`);
+          }
+        } else {
+        }
+      }
+      fetchImagem();
+    }, [produto.imagemcadastro]);
+
+    return (
+      <View style={styles.card}>
+        <View style={styles.idsview}>
+          <Text style={styles.txtidproduto}>{produto.idproduto}</Text>
+          <Text style={styles.txtidestoque}>{produto.qtdestoque}</Text>
+          <Text style={styles.txtidestoque}>{produto.idestoque}</Text>
+        </View>
+        <Image
+          style={styles.image}
+          alt="ImgProduto"
+          //   source={require('../assets/Images/ProdutoSemImagem.png')}
+          source={
+            imagemBanco
+              ? {
+                  uri:
+                    imagemBanco ||
+                    'https://cdn-icons-png.freepik.com/256/5544/5544155.png',
+                }
+              : require('../assets/Images/ProdutoSemImagem.png')
+          }
+        />
+        <View style={styles.view1}>
+          <View style={styles.view2}>
+            <Text style={styles.txtdescricao}>{produto.descricao}</Text>
+          </View>
+          <View>
+            <Text style={styles.txtprecovenda}>
+              R$ {String(produto.precovenda?.toFixed(2)).replace('.', ',')}
+            </Text>
+          </View>
+        </View>
+        {/* <Text fontSize={12} color="#2A64D0">
+        {`Quantidade: ${produto.quantidade} ${produto.siglaunimedida}`}
+      </Text> */}
+
+        <TouchableOpacity
+          onPress={() => {
+            handleInsert(produto, 1);
+          }}
+        >
+          <View style={styles.view4}>
+            <Text style={styles.txtinserir}>Inserir</Text>
+          </View>
+        </TouchableOpacity>
+      </View>
+    );
+  },
+);
+
+const styles = StyleSheet.create({
+  card: {
+    padding: 14,
+    justifyContent: 'space-between',
+    width: '48%',
+    marginRight: 5,
+    marginBottom: 15,
+    borderRadius: 8,
+    borderColor: colors.CinzaClaro,
+    borderWidth: 1,
+  },
+  txtidproduto: { fontWeight: 'bold', color: '#2A64D0', fontSize: 16 },
+  image: {
+    width: 150,
+    height: 150,
+    alignSelf: 'center',
+    backgroundColor: '#E9E9E9',
+    borderRadius: 8,
+    marginBottom: 3,
+  },
+  view1: { flexDirection: 'row', justifyContent: 'space-between' },
+  view2: { width: '50%' },
+  txtdescricao: { fontWeight: 'bold', color: '#2A64D0', fontSize: 14 },
+  txtprecovenda: { fontWeight: 'bold', color: '#2A64D0', fontSize: 18 },
+
+  view4: {
+    paddingHorizontal: 20,
+    justifyContent: 'center',
+    borderColor: '#2A64D0',
+    flex: 1,
+    borderRadius: 10,
+    borderWidth: 1.8,
+    paddingVertical: 2,
+  },
+  txtinserir: { alignSelf: 'center', color: '#2A64D0' },
+  idsview: {
+    flexDirection: 'row',
+    width: '100%',
+    justifyContent: 'space-between',
+  },
+  txtidestoque: {
+    color: '#c7c7c7ff',
+  },
+});
+
+export default ProdutoCard;
+---------- "src\components\CardReceberPagamento.tsx" ---------- 
+import {
+  Alert,
+  Linking,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+} from 'react-native';
+import LinearGradient from 'react-native-linear-gradient';
+
+
+const CardReceberPagamento = ({total, idmovimento, nummesa}: any) => {
+  const returnScheme = 'reactnativeversapos'; // igual ao AndroidManifest
+
+  
+  async function enviarPagamento() {
+    console.log('Card.tsx: Fazendo tentativa de pagamento!');
+
+    
+    let url = 'payment-app://pay?';
+    
+    url += 'amount=' + total;
+    url += '&return_scheme=' + returnScheme;
+    url += '&editable_amount=1';
+    url += '&order_id=' + String(idmovimento) + '-' + String(nummesa);
+
+    console.log('link d epagamento enviado: ', JSON.stringify(url))
+    
+    try {
+      await Linking.openURL(url);
+    } catch (err) {
+      Alert.alert('Card.tsx: Erro ao abrir deeplink:', String(err));
+      console.log('Card.tsx: Erro ao abrir deeplink: ', err);
+    }
+  }
+
+
+  return (
+
+    <TouchableOpacity style={s.mainTouch} onPress={() => enviarPagamento()}>
+      <LinearGradient style={s.mainLinear} colors={['#99B0DC', '#2A64D0']}>
+        <Text style={s.mainText}>Receber pagamento</Text>
+      </LinearGradient>
+    </TouchableOpacity>
+
+    
+  );
+};
+
+const s = StyleSheet.create({
+  mainTouch: { width: '100%', marginTop: 10 },
+  mainLinear: { padding: 10, alignItems: 'center', borderRadius: 10 },
+  mainText: { color: 'white', fontWeight: 'bold' },
+});
+
+
+
+
+export default CardReceberPagamento;
+---------- "src\components\CardsMesaInfo.tsx" ---------- 
+import React, { useState } from 'react';
+import { View, Text, Image, StyleSheet } from 'react-native';
+import EyeAnimation from './EyeAnimation';
+
+const Cliente: React.FC<{ nome?: string }> = ({ nome }) => (
+  <View style={s.ViewMesaInfoItem}>
+    <View style={s.imageiconiteminfomesawrapper}>
+      <Image
+        alt="icon_cliente"
+        style={s.imageIconInfoMesaItem1}
+        source={require('../assets/Images/icon_cliente.png')}
+      />
+    </View>
+    <Text style={s.textItemMesaInfo}> Cliente: </Text>
+    <Text style={s.textValorItemMesaInfo}> {nome} </Text>
+  </View>
+);
+
+const Garcom: React.FC<{ nome?: string }> = ({ nome }) => (
+  <View style={s.ViewMesaInfoItem}>
+    <View style={s.imageiconiteminfomesawrapper}>
+      <Image
+        alt="icon_garcom"
+        style={s.imageIconInfoMesaItem2}
+        source={require('../assets/Images/icon_garcom.png')}
+      />
+    </View>
+    <Text style={[s.textItemMesaInfo]}> Garçom: </Text>
+    <Text style={s.textValorItemMesaInfo}> {nome} </Text>
+  </View>
+);
+
+const Abertura: React.FC<{ abertura?: string }> = ({ abertura }) => (
+  <View style={s.ViewMesaInfoItem}>
+    <View style={s.imageiconiteminfomesawrapper}>
+      <Image
+        alt="icon_abertura"
+        style={s.imageIconInfoMesaItem3}
+        source={require('../assets/Images/icon_abertura.png')}
+      />
+    </View>
+    <Text style={[s.textItemMesaInfo]}> Abertura: </Text>
+    <Text style={s.textValorItemMesaInfo}> {abertura} </Text>
+  </View>
+);
+
+const Utilizacao: React.FC<{ utilizacao?: string }> = ({ utilizacao }) => (
+  <View style={s.ViewMesaInfoItem}>
+    <View style={s.imageiconiteminfomesawrapper}>
+      <Image
+        alt="icon_utilizacao"
+        style={s.imageIconInfoMesaItem4}
+        source={require('../assets/Images/icon_utilizacao.png')}
+      />
+    </View>
+    <Text style={[s.textItemMesaInfo]}> Utilização: </Text>
+    <Text style={s.textValorItemMesaInfo}> {utilizacao} </Text>
+  </View>
+);
+
+const Taxa: React.FC<{ taxa?: number }> = ({ taxa }) => {
+  const [taxaVisivel, settaxaVisivel] = useState(false);
+
+  return (
+    <View style={s.ViewMesaInfoItem}>
+      <View style={s.imageiconiteminfomesawrapper}>
+        <Image
+          alt="icon_taxa"
+          style={s.imageIconInfoMesaItem5}
+          source={require('../assets/Images/icon_taxa.png')}
+        />
+      </View>
+      <Text style={[s.textItemMesaInfo]}> Taxa: </Text>
+
+      {taxaVisivel && (
+        <Text style={s.textValorItemMesaInfo}>
+          R$ {taxa && String(taxa?.toFixed(2)).replace('.', ',')}
+          {!taxa && '0,00'}{' '}
+        </Text>
+      )}
+      <View style={s.EyeAnimationTaxa}>
+        <EyeAnimation
+          onPress={() => settaxaVisivel(!taxaVisivel)}
+          visible={taxaVisivel}
+        />
+      </View>
+    </View>
+  );
+};
+const Consumacao: React.FC<{ consumacao?: number }> = ({ consumacao }) => (
+  <View style={s.ViewMesaInfoItem}>
+    <View style={s.imageiconiteminfomesawrapper}>
+      <Image
+        alt="icon_consumacao"
+        style={s.imageIconInfoMesaItem6}
+        source={require('../assets/Images/icon_consumacao.png')}
+      />
+    </View>
+    <Text style={s.textItemMesaInfo}> Consumação: </Text>
+    <Text style={s.textValorItemMesaInfo}>
+      R$ {consumacao && String(consumacao?.toFixed(2)).replace('.', ',')}
+      {!consumacao && '0,00'}
+    </Text>
+  </View>
+);
+
+const TotalMesa: React.FC<{ total?: number }> = ({ total }) => {
+  return (
+    <View style={s.ViewTotalMesa}>
+      <Image
+        alt="icon_totalmesa"
+        style={s.imageTotalMesa}
+        source={require('../assets/Images/icon_totalmesa.png')}
+      />
+      <Text style={s.textTotal}>Total:</Text>
+
+      <Text style={s.TotalMesaNumber}>
+        R$ {total && String(total?.toFixed(2)).replace('.', ',')}
+      </Text>
+    </View>
+  );
+};
+
+// --- Objeto principal com subcomponentes ---
+export const CardMesaInfo = {
+  Cliente,
+  Garcom,
+  Taxa,
+  Abertura,
+  Utilizacao,
+  Consumacao,
+  TotalMesa
+};
+
+const s = StyleSheet.create({
+  ViewMesaInfoItem: {
+    flexDirection: 'row',
+    paddingBottom: 1,
+    height: 30,
+    marginTop: 1,
+    paddingLeft: 3,
+    borderBottomColor: 'gray',
+    borderBottomWidth: 1,
+  },
+  imageIconInfoMesaItem1: {
+    width: 20,
+    height: 20,
+  },
+  imageIconInfoMesaItem2: {
+    width: 21,
+    height: 25,
+  },
+  imageIconInfoMesaItem3: {
+    width: 20,
+    height: 20,
+    marginTop: 3,
+  },
+  imageIconInfoMesaItem4: {
+    width: 20,
+    height: 20,
+    marginTop: 3,
+  },
+  imageIconInfoMesaItem5: {
+    width: 17,
+    height: 20,
+    marginTop: 3,
+  },
+  imageIconInfoMesaItem6: {
+    width: 20,
+    height: 24,
+    marginTop: 3,
+  },
+  imageiconiteminfomesawrapper: {
+    width: 24,
+  },
+  textItemMesaInfo: {
+    color: '#2A64D0',
+    width: 100,
+    alignSelf: "center"
+  },
+  textValorItemMesaInfo: {
+    color: '#74747B',
+    alignSelf: "center"
+  },
+  EyeAnimationTaxa: {
+    position: 'absolute',
+    right: 0,
+    top: -5,
+  },
+  ViewTotalMesa: {
+    backgroundColor: '#7392CD',
+    width: '100%',
+    height: 45,
+    borderRadius: 10,
+    
+    
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 3,
+  },
+  imageTotalMesa: {
+    width: 25,
+    height: 25,
+  },
+  textTotal: {
+    marginLeft: 1,
+    fontWeight: 'bold',
+    color: 'white',
+  },
+  TotalMesaNumber: {
+    marginRight: 5,
+    fontSize: 20,
+    fontWeight: "bold",
+    marginLeft: 3,
+    color: "white"
+
+     
+  }
+});
+---------- "src\components\CardTrasnfetirImprimir.tsx" ---------- 
+import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import LinearGradient from 'react-native-linear-gradient';
+import CardImprimirConta from './CardImprimirConta';
+
+interface CardTransfimpProps {
+  idmovimento?: string;
+  onPressTransferir?: () => void;
+  info: any
+}
+
+const CardTrasnfetirImprimir = ({
+  idmovimento,
+  onPressTransferir,
+  info
+}: CardTransfimpProps) => {
+  return (
+    <View style={s.MainView}>
+      <LinearGradient colors={['#2A64D0', '#99B0DC']} style={s.cardLeft}>
+        <TouchableOpacity onPress={onPressTransferir}>
+          <Image
+            style={s.imageLeft}
+            source={require('../assets/Images/icon_transferirmesa.png')}
+          />
+        </TouchableOpacity>
+      </LinearGradient>
+
+      <LinearGradient colors={['#2A64D0', '#99B0DC']} style={s.cardMiddle}>
+        <Text style={s.textMiddle}>N° venda: {idmovimento}</Text>
+      </LinearGradient>
+
+      <CardImprimirConta
+        info={info}
+      />
+    </View>
+  );
+};
+
+const s = StyleSheet.create({
+  MainView: {
+    flexDirection: 'row',
+    borderRadius: 10,
+    overflow: 'hidden',
+    marginTop: 10,
+    maxHeight: 70,
+  },
+  cardLeft: {
+    width: '33.1%',
+    justifyContent: 'center',
+    padding: 10,
+  },
+  imageLeft: {
+    width: 70,
+    height: 30,
+    alignSelf: 'center',
+  },
+  cardMiddle: {
+    marginHorizontal: 1,
+    flex: 1,
+    padding: 10,
+    justifyContent: 'center',
+  },
+  textMiddle: {
+    color: 'white',
+    fontSize: 12,
+    alignSelf: 'center',
+    textAlign: 'center',
+    fontWeight: 'bold',
+  },
+});
+
+export default CardTrasnfetirImprimir;
+---------- "src\components\CardVoltar.tsx" ---------- 
+import LinearGradient from "react-native-linear-gradient"
+import colors from "../ThemeContext/colors"
+import { Image, StyleSheet } from "react-native"
+// import { faAngleLeft } from "@fortawesome/free-solid-svg-icons"
+// import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome"
+// @ts-ignore
+import Icon from 'react-native-vector-icons/Feather';
+
+const CardVoltar = () => {
+
+
+    return (
+
+        <LinearGradient
+                    // Backgro3und Linear Gradient
+                    colors={[colors.AzulClaro, "#7392CD"]
+                    }
+                    style={s.arrowleft}
+                  >
+                    
+                  
+        {/* <FontAwesomeIcon icon={faAngleLeft as any}  color='white'/> */}
+        <Image source={require("../assets/Images/arrow_left_white.png")}
+        style={{width: 8, height: 15}}/>
+          </LinearGradient>
+        
+    )
+}
+
+
+const s = StyleSheet.create({
+    arrowleft: {
+    backgroundColor: colors.AzulClaro,
+    margin:10,
+    padding: 4,
+    paddingHorizontal: 15,
+    borderRadius: 7,
+    
+    
+    alignSelf: "center"
+  }
+})
+
+
+export default CardVoltar;---------- "src\components\Carrinho.tsx" ---------- 
+import {
+  FlatList,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+import renderitemcarrinho from './renderItemCarrinho';
+import { ButtonCustom } from './Button';
+import CardNumMesa from './CardNumMesa';
+import { reset } from '../Rotas/NavigatorContainerRef';
+import Rotas from '../Rotas/Rotas';
+import { useEmpresa } from '../Context/empresaContext';
+import { useUser } from '../Context/userContext';
+import {
+  MovimentoCriarMesa,
+  MovimentoInserirItensCarrinhoMesa,
+} from '../API/api_rotas';
+import { useCarrinho } from '../Context/carrinhoContext';
+
+interface CarrinhoProps {
+  nummesa?: any;
+  statusmesa?: any;
+  idmovimento: any;
+  carrinhoAberto: any;
+  setCarrinhoAberto: (item: any) => void;
+}
+
+const Carrinho = ({
+  nummesa,
+  statusmesa,
+  idmovimento,
+  carrinhoAberto,
+  setCarrinhoAberto
+}: CarrinhoProps) => {
+
+  const { empresa } = useEmpresa();
+  const { user } = useUser();
+  const {carrinho, setCarrinho} = useCarrinho();
+
+  async function InserirProdutosMovimentoCarrinho() {
+    let idmov = idmovimento;
+
+    if (carrinho.length === 0) {
+      const data = new Date();
+
+      reset(Rotas.Mesa, {
+        idmovimento: idmov,
+        nummesa: nummesa,
+        data: `${data}`,
+        statusmesa: statusmesa,
+      });
+
+      return null;
+    }
+
+    const servername = user.servername;
+    const serverport = user.serverport;
+    const pathbanco = user.pathbanco;
+    const idempresa = empresa?.idparametro;
+    const codigoclientepadraobalcao = empresa?.codigoclientepadraobalcao;
+    const idestoquepadraopedido = empresa?.idestoquepadraopedido;
+    const codigofuncionariopadrao = user.idfuncionario;
+    const idformapagtocaixa = empresa?.idformapagtocaixa;
+    const idusuario = user.usuario;
+    const tipomovimentomesascomandas = empresa?.tipomovimentomesascomandas;
+
+    if (!idmov) {
+      // console.log('checkpoint 0')
+      const result = await MovimentoCriarMesa({
+        servername,
+        serverport,
+        pathbanco,
+        idreferencia: codigoclientepadraobalcao,
+        idempresa,
+        idestoque: idestoquepadraopedido,
+        idfuncionario: codigofuncionariopadrao,
+        idformapagtocaixa,
+        usuarioinc: idusuario,
+        nummesa,
+        statusmesa: 'O',
+        nomecliente: '',
+        tipomovimento: tipomovimentomesascomandas ?? 'B',
+      });
+      // console.log('checkpoint 1')
+
+      // Alert.alert(
+      //   'Mesa aberta com sucesso! nummesa: ' + JSON.stringify(result.data?.nummesa),
+      // );
+
+      idmov = String(result.data?.idmovimento);
+    }
+    
+    console.log('checkpoint 2')
+    const resultado = await MovimentoInserirItensCarrinhoMesa({
+      servername,
+      serverport,
+      pathbanco,
+      idmovimento: idmov,
+      idusuario,
+      produtos: carrinho,
+      codigofuncionariopadrao,
+      idempresa,
+    });
+    console.log(resultado?.data)
+    // Alert.alert(
+    //   'Produto(s) inserido(s) com sucesso!',
+    //   JSON.stringify(resultado.data),
+    // );
+
+    const data = new Date();
+    setCarrinho([])
+    reset(Rotas.Mesa, {
+      idmovimento: idmov,
+      nummesa: nummesa,
+      data: `${data}`,
+      statusmesa: 'O',
+    });
+  }
+
+  return (
+    <View style={[s.Footer, carrinhoAberto && s.mainv]}>
+      
+      <View style={s.footerheader}>
+        <TouchableOpacity
+          onPress={() => {
+            setCarrinhoAberto(!carrinhoAberto);
+          }}
+        >
+          <CardNumMesa mesa={{ nummesa: nummesa, statusmesa: statusmesa }} />
+        </TouchableOpacity>
+
+        <ButtonCustom
+          title="Concluir"
+          onPress={() => {
+            InserirProdutosMovimentoCarrinho();
+          }}
+          style={s.ButtomConcluir}
+        />
+      </View>
+
+      <FlatList
+      // ListHeaderComponent={<View><Text>{JSON.stringify(carrinho)}</Text></View>}
+        data={carrinho}
+        renderItem={renderitemcarrinho}
+        keyExtractor={item => item.codigobarras}
+      />
+    </View>
+  );
+};
+
+const s = StyleSheet.create({
+  Footer: {
+    maxHeight: '45%',
+    height: 60,
+
+    borderTopLeftRadius: 10,
+    borderTopRightRadius: 10,
+  },
+  footerheader: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+  },
+  ButtomConcluir: {
+    height: 55,
+    justifyContent: 'center',
+    fontWeight: 'bold',
+    width: 160,
+  },
+  mainv: { height: '45%' }
+});
+
+export default Carrinho;
+---------- "src\components\EyeAnimation.tsx" ---------- 
+import React, { useRef, useEffect } from 'react';
+import { TouchableOpacity, Animated, Easing, StyleSheet } from 'react-native';
+import Svg, { Circle, Path, G } from 'react-native-svg';
+
+// Criar componentes animados
+const AnimatedPath = Animated.createAnimatedComponent(Path);
+const AnimatedG = Animated.createAnimatedComponent(G);
+
+interface EyeAnimationProps {
+  visible: boolean;
+  onPress: () => void;
+}
+
+const EyeAnimation = ({ visible, onPress }: EyeAnimationProps) => {
+  const eyeAnim = useRef(new Animated.Value(visible ? 1 : 0)).current;
+  const blinkAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    // Atualiza a animação quando a prop 'visible' muda
+    Animated.timing(eyeAnim, {
+      toValue: visible ? 1 : 0,
+      duration: 300,
+      easing: Easing.out(Easing.ease),
+      useNativeDriver: true,
+    }).start();
+  }, [visible]);
+
+  const handlePress = () => {
+    // Animação de piscar rápido
+    Animated.sequence([
+      Animated.timing(blinkAnim, {
+        toValue: 1,
+        duration: 50,
+        useNativeDriver: true,
+      }),
+      Animated.timing(blinkAnim, {
+        toValue: 0,
+        duration: 50,
+        useNativeDriver: true,
+      }),
+    ]).start();
+
+    onPress();
+  };
+
+  // Interpolações para as animações
+  const eyelidTop = eyeAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: ['M5,10 Q15,20 25,10', 'M5,5 Q15,0 25,5'],
+  });
+
+  const eyelidBottom = eyeAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: ['M5,20 Q15,10 25,20', 'M5,25 Q15,30 25,25'],
+  });
+
+  const irisScale = eyeAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0.3, 1],
+  });
+
+  const irisOpacity = eyeAnim.interpolate({
+    inputRange: [0, 0.5, 1],
+    outputRange: [0, 0.7, 1],
+  });
+
+  return (
+    <TouchableOpacity 
+    
+      onPress={handlePress}
+      style={styles.container}
+      activeOpacity={0.7}
+    >
+      <Svg width={36} height={30} viewBox="0 0 30 30">
+        {/* Parte branca do olho */}
+        <Circle cx="15" cy="15" r="10" fill="#f0f0f0" stroke="#ddd" strokeWidth={0.8} />
+        
+        {/* Íris animada */}
+        <AnimatedG
+          opacity={irisOpacity}
+          transform={[{ scale: irisScale }]}
+          originX="15"
+          originY="15"
+        >
+          <Circle cx="15" cy="15" r="5" fill="#4a6da7" />
+          <Circle cx="15" cy="13" r="1.5" fill="#2c4365" opacity={0.8} />
+          <Circle cx="16" cy="14" r="0.5" fill="#fff" opacity={0.9} />
+        </AnimatedG>
+        
+        {/* Pálpebra superior */}
+        <AnimatedPath
+          d={eyelidTop}
+          fill="#f8f8f8"
+          stroke="#ccc"
+          strokeWidth={0.8}
+          strokeLinecap="round"
+        />
+        
+        {/* Pálpebra inferior */}
+        <AnimatedPath
+          d={eyelidBottom}
+          fill="#f8f8f8"
+          stroke="#ccc"
+          strokeWidth={0.8}
+          strokeLinecap="round"
+        />
+        
+        {/* Efeito de piscar */}
+        <AnimatedPath
+          d="M5,5 Q15,0 25,5 L25,25 Q15,30 5,25 Z"
+          fill="#f8f8f8"
+          opacity={blinkAnim}
+        />
+      </Svg>
+    </TouchableOpacity>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    width: 40,
+    height: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginLeft: 8,
+  },
+});
+
+export default EyeAnimation;---------- "src\components\GrupoProdutoCard.tsx" ---------- 
+
+import { View, Text, Image } from "react-native";
+
+interface InputProps {
+    imagem?: any,
+    descricao?: string
+}
+
+export default function GrupoProdutoCard({
+    imagem,
+    descricao
+}: InputProps){
+    
+    /*useEffect(() => {console.log(imagem)})*/
+
+    
+    return (
+        
+            <View style={{ alignSelf:"center",   }}>
+        
+            <Image
+                
+                
+                style={{width: 160, height:160, alignSelf: "center", marginTop: 5}}
+                alt="GrupoProduto"
+                source={imagem}
+            />
+            <Text style={{marginTop: -20, fontWeight: "bold", color: "white", alignSelf: "center", }}>{descricao}</Text>
+            </View>
+
+    )
+}---------- "src\components\LoginNumericInput.tsx" ---------- 
+import { StyleSheet, Text, TextInput, View } from 'react-native';
+import colors from '../ThemeContext/colors';
+
+interface LoginInputNumeric{
+  label?: string | undefined;
+  placeholder?: string | undefined;
+  onChangeText?: (text: any) => void;
+  value?: string | number | undefined;
+
+}
+
+const LoginInputNumeric = ({ label, placeholder, onChangeText, value }: LoginInputNumeric) => {
+
+
+  return (
+    <View style={s.MainView}>
+      {label && <Text style={s.labelText}>{label}</Text>}
+      <View style={s.InputView}>
+        <TextInput
+          placeholderTextColor={"#9b9999ff"}
+          placeholder={placeholder}
+          style={s.input}
+          keyboardType="numeric"
+          onChangeText={onChangeText}
+          value={value?.toString()}
+   
+          
+        />
+      </View>
+    </View>
+  );
+};
+
+const s = StyleSheet.create({
+  MainView: {
+    
+    marginHorizontal: 10,
+    
+  },
+  InputView: {
+    borderWidth: 1,
+    borderRadius: 10,
+    borderColor: colors.AzulEscuro,
+  },
+  labelText: {
+    color: colors.AzulEscuro,
+    fontWeight: 'bold',
+  },
+  input: {
+    color: colors.AzulEscuro,
+    fontSize: 16,
+    
+  }
+});
+
+export { LoginInputNumeric };
+---------- "src\components\LoginTextInput.tsx" ---------- 
+import {
+  Image,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+import { useState } from 'react';
+import colors from '../ThemeContext/colors';
+
+interface LoginInputTextProps {
+  label?: string | undefined;
+  hideview?: boolean;
+  placeholder?: string | undefined;
+  onChangeText: (text: any) => void;
+  value: number | string | undefined;
+  style?: any
+}
+
+const LoginInputText = ({
+  label,
+  hideview = false,
+  placeholder,
+  onChangeText,
+  value,
+  style
+}: LoginInputTextProps) => {
+  const showeye = require('../assets/Images/eye-closed.png');
+  const hideeye = require('../assets/Images/eye-open.png');
+
+  const [show, setshow] = useState(hideview);
+  setshow;
+
+  return (
+    <View style={[s.MainView, style && style]}>
+      <Text style={s.labelText}>{label}</Text>
+      <View style={s.InputView}>
+        <TextInput
+          placeholder={placeholder}
+          style={s.input}
+          autoCapitalize="none"
+          secureTextEntry={show}
+          onChangeText={onChangeText}
+          value={value?.toString()}
+        />
+        {hideview && (
+          <TouchableOpacity
+            style={s.touch}
+            onPress={() => setshow((prev: any) => !prev)}
+          >
+            <Image
+              resizeMode="contain"
+              source={show ? hideeye : showeye}
+              style={s.eye}
+            />
+          </TouchableOpacity>
+        )}
+      </View>
+    </View>
+  );
+};
+
+const s = StyleSheet.create({
+  MainView: {
+    marginHorizontal: 10,
+  },
+  InputView: {
+    borderWidth: 1,
+    borderRadius: 10,
+    borderColor: colors.AzulEscuro,
+    flexDirection: 'row',
+  },
+  labelText: {
+    color: colors.AzulEscuro,
+    fontWeight: 'bold',
+  },
+  input: {
+    color: colors.AzulEscuro,
+    flex: 1,
+    fontSize: 16,
+  },
+  eye: {
+    width: 25,
+    height: 25,
+    opacity: 0.5,
+    marginRight: 3,
+  },
+  touch: {
+    alignSelf: 'center',
+  },
+});
+
+export { LoginInputText };
+---------- "src\components\ModalSelecionarFornecedor.tsx" ---------- 
+import React, { useCallback, useMemo, useState } from 'react';
+import {
+  Modal,
+  View,
+  Text,
+  TextInput,
+  Button,
+  TouchableOpacity,
+  FlatList,
+  StyleSheet,
+  Alert,
+  ActivityIndicator,
+} from 'react-native';
+import {
+  ConsultaFornecedorParceiro,
+  UpdateFornecedorMovimento,
+} from '../API/api_rotas';
+import { useUser } from '../Context/userContext';
+import { useEmpresa } from '../Context/empresaContext';
+import { reset } from '../Rotas/NavigatorContainerRef';
+import Rotas from '../Rotas/Rotas';
+
+const ModalSelecionarFornecedor = ({ visible, onClose, idmovimento, nummesa, statusmesa }: any) => {
+  const [filtro, setFiltro] = useState('Nome');
+  const [pesquisa, setPesquisa] = useState('');
+  const [fornecedores, setFornecedores] = useState<any[]>([]);
+  const [fornecedorSelecionado, setFornecedorSelecionado] = useState<any>(null);
+  const [pesquisando, setpesquisando] = useState(false);
+
+  const { user } = useUser();
+  const { empresa } = useEmpresa();
+
+  const filtros = useMemo(
+    () => ['Nome', 'IdFornecedor', 'CNPJ', 'Apelido'],
+    [],
+  );
+
+  const pesquisarFornecedores = async () => {
+    if (
+      pesquisa.length < 3 &&
+      (filtro === 'Nome' || filtro === 'Apelido' || filtro === 'CNPJ')
+    ) {
+      Alert.alert(
+        'Alerta',
+        'Digite pelo menos 3 caracteres no campo de pesquisa',
+      );
+      return;
+    }
+    if (pesquisa.length < 1 && filtro === 'IdFornecedor') {
+      Alert.alert(
+        'Alerta',
+        'Digite pelo menos 1 caractere no campo de pesquisa',
+      );
+      return;
+    }
+
+    setpesquisando(true);
+    setFornecedores([]);
+    const servername = user.servername;
+    const serverport = user.serverport;
+    const pathbanco = user.pathbanco;
+    const idempresa = empresa?.idparametro;
+
+    try {
+      const resultado = await ConsultaFornecedorParceiro({
+        serverport: serverport,
+        servername: servername,
+        pathbanco: pathbanco,
+        tipopesquisa:
+          filtro === 'Nome'
+            ? '0'
+            : filtro === 'IdFornecedor'
+            ? '1'
+            : filtro === 'CNPJ'
+            ? '2'
+            : filtro === 'Apelido'
+            ? '3'
+            : '0',
+        pesquisa: pesquisa.toUpperCase(),
+        idempresa: idempresa,
+      });
+
+      // Alert.alert('Resultado: ', JSON.stringify(resultado.data));
+
+      setFornecedores(resultado.data);
+    } catch (error: any) {
+      Alert.alert('Alerta', JSON.stringify(error?.message ?? error));
+    } finally {
+      setpesquisando(false);
+    }
+  };
+
+  const selecionarFornecedor = async () => {
+    try {
+      if (fornecedorSelecionado) {
+        updateFornecedor();
+      } else {
+        Alert.alert('Selecione um fornecedor!');
+      }
+    } catch (error) {
+    } finally {
+      onClose();
+    }
+  };
+
+  const cancelar = () => {
+    setFornecedorSelecionado(null);
+    onClose();
+  };
+
+  const updateFornecedor = useCallback(async () => {
+    const servername = user.servername;
+    const serverport = user.serverport;
+    const pathbanco = user.pathbanco;
+    const idempresa = empresa?.idparametro;
+
+    const resultado = await UpdateFornecedorMovimento({
+      serverport: serverport,
+      servername: servername,
+      pathbanco: pathbanco,
+      idfornecedor: fornecedorSelecionado.idfornecedor,
+      idmovimento: idmovimento,
+      idempresa: idempresa,
+    });
+
+    if (resultado) {
+      
+      const dataenviar = new Date();
+
+      reset(Rotas.Mesa, {
+                      idmovimento: idmovimento,
+                      nummesa: nummesa,
+                      data: `${dataenviar}`,
+                      statusmesa: statusmesa,
+                    });
+    }
+    // Alert.alert("Resultado: ",JSON.stringify(resultado.data))
+  }, [fornecedorSelecionado]);
+
+  const handleSelecionarItem = useCallback((item: any) => {
+    setFornecedorSelecionado(item);
+  }, []);
+
+  return (
+    <Modal visible={visible} transparent animationType="slide">
+      <View style={styles.overlay}>
+        <View style={styles.modalContainer}>
+          <Text style={styles.title}>Selecione um Fornecedor</Text>
+
+          {/* Filtro de pesquisa */}
+          <View style={styles.filterContainer}>
+            {filtros.map(item => (
+              <TouchableOpacity
+                key={item}
+                style={[
+                  styles.filterOption,
+                  filtro === item && styles.filterSelected,
+                ]}
+                onPress={() => setFiltro(item)}
+              >
+                <Text
+                  style={[
+                    styles.filterText,
+                    filtro === item && styles.filterTextSelected,
+                  ]}
+                >
+                  {item}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+
+          {/* Campo de pesquisa */}
+          <View style={styles.searchContainer}>
+            <TextInput
+              style={styles.input}
+              placeholder={`Pesquisar por ${filtro}`}
+              value={pesquisa}
+              onChangeText={setPesquisa}
+            />
+            {pesquisando ? (
+              <ActivityIndicator size={'small'} />
+            ) : (
+              <Button
+                title="Pesquisar"
+                onPress={() => {
+                  pesquisarFornecedores();
+                  setFornecedorSelecionado(null);
+                }}
+              />
+            )}
+          </View>
+
+          {/* Lista de fornecedores */}
+          <FlatList
+            data={fornecedores}
+            keyExtractor={item => item.idfornecedor.toString()}
+            style={styles.list}
+            renderItem={({ item }) => (
+              <FornecedorItem
+                item={item}
+                selecionado={
+                  fornecedorSelecionado?.idfornecedor === item.idfornecedor
+                }
+                onPress={handleSelecionarItem}
+              />
+            )}
+          />
+
+          {/* Botões inferiores */}
+          <View style={styles.footer}>
+            <TouchableOpacity
+              style={[styles.button, styles.cancelButton]}
+              onPress={cancelar}
+            >
+              <Text style={styles.buttonText}>Cancelar</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[styles.button, styles.selectButton]}
+              onPress={() => selecionarFornecedor()}
+              disabled={!fornecedorSelecionado}
+            >
+              <Text style={styles.buttonText}>Selecionar</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </View>
+    </Modal>
+  );
+};
+
+export default ModalSelecionarFornecedor;
+
+const styles = StyleSheet.create({
+  overlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.4)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContainer: {
+    backgroundColor: '#fff',
+    width: '90%',
+    borderRadius: 10,
+    padding: 16,
+    maxHeight: '90%',
+  },
+  title: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    textAlign: 'center',
+  },
+  filterContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginBottom: 12,
+  },
+  filterOption: {
+    padding: 6,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#ccc',
+  },
+  filterSelected: {
+    backgroundColor: '#007bff33',
+    borderColor: '#007bff',
+  },
+  filterText: {
+    color: '#555',
+  },
+  filterTextSelected: {
+    color: '#007bff',
+    fontWeight: 'bold',
+  },
+  searchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  input: {
+    flex: 1,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 8,
+    paddingHorizontal: 8,
+    marginRight: 8,
+    height: 40,
+  },
+  list: {
+    flexGrow: 0,
+    marginBottom: 12,
+  },
+  listItem: {
+    padding: 10,
+    borderBottomWidth: 1,
+    borderColor: '#eee',
+  },
+  listItemSelected: {
+    backgroundColor: '#007bff22',
+  },
+  listItemText: {
+    fontSize: 16,
+    fontWeight: '500',
+  },
+  listItemSub: {
+    fontSize: 13,
+    color: '#666',
+  },
+  footer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  button: {
+    flex: 1,
+    marginHorizontal: 6,
+    padding: 10,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  cancelButton: {
+    backgroundColor: '#999',
+  },
+  selectButton: {
+    backgroundColor: '#007bff',
+  },
+  buttonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+  },
+});
+
+const FornecedorItem = React.memo(({ item, selecionado, onPress }: any) => {
+  return (
+    <TouchableOpacity
+      style={[styles.listItem, selecionado && styles.listItemSelected]}
+      onPress={() => onPress(item)}
+    >
+      <Text style={styles.listItemText}>{item.nome}</Text>
+      <Text style={styles.listItemSub}>CNPJ: {item.cnpj}</Text>
+      <Text style={styles.listItemSub}>Apelido: {item.apelido}</Text>
+    </TouchableOpacity>
+  );
+});
+---------- "src\components\renderItemCarrinho.tsx" ---------- 
+import { StyleSheet, View } from "react-native"
+import ProdutoCardCarrinho from "./CardProdutoInserirCarrinho"
+
+const renderitemcarrinho = (item: any) => {
+        return (<View style={s.viewItemCarrinho}>
+            <ProdutoCardCarrinho produto={item.item}/>
+                </View>
+        )
+    }
+
+
+
+    const s = StyleSheet.create({
+        viewItemCarrinho: {width: "100%", justifyContent: "center"}
+    })
+
+
+    export default renderitemcarrinho;---------- "src\components\Switch.tsx" ---------- 
+import React, { useEffect, useRef, useState } from 'react';
+import {
+  Animated,
+  Easing,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+  ViewStyle,
+  TextStyle,
+  AccessibilityProps,
+} from 'react-native';
+
+/**
+ * SwitchCustom.tsx
+ * -----------------
+ * Componente de switch estilizado e completo para React Native.
+ * - Suporta controle (controlled) e não-controlado (uncontrolled)
+ * - Animação suave
+ * - Prop `size` para alterar dimensões (small | medium | large)
+ * - `onColor` e `offColor` customizáveis
+ * - `disabled`, `label`, `style` e acessibilidade
+ *
+ * Como usar:
+ * import SwitchCustom from './SwitchCustom';
+ * <SwitchCustom
+ *   value={value}
+ *   onChange={val => setValue(val)}
+ *   label="Pagamento NFC"
+ * />
+ */
+
+type Size = 'small';
+
+interface Props extends AccessibilityProps {
+  value?: boolean; // se informado, component fica controlado
+  defaultValue?: boolean; // valor inicial se uncontrolled
+  onChange?: (val: boolean) => void;
+  disabled?: boolean;
+  label?: string | React.ReactNode;
+  onColor?: string; // cor do fundo quando ON
+  offColor?: string; // cor do fundo quando OFF
+  thumbColor?: string; // cor do pino
+  size?: Size;
+  style?: ViewStyle;
+  labelStyle?: TextStyle;
+}
+
+const SIZE_MAP = {
+  small: { width: 44, height: 22, thumb: 18, padding: 3 },
+};
+
+export default function SwitchCustom({
+  value,
+  defaultValue = false,
+  onChange,
+  disabled = false,
+  label,
+  onColor = '#3562BC',
+  offColor = '#a7aaafff',
+  thumbColor = '#ffffff',
+  size = 'small',
+  style,
+  labelStyle,
+  accessibilityLabel,
+  ...accessibilityProps
+}: Props) {
+  const isControlled = typeof value === 'boolean';
+  const [internalValue, setInternalValue] = useState<boolean>(
+    isControlled ? (value as boolean) : defaultValue
+  );
+
+  // Animated value: 0 = off, 1 = on
+  const anim = useRef(new Animated.Value(internalValue ? 1 : 0)).current;
+
+  // update internal state when controlled
+  useEffect(() => {
+    if (isControlled) {
+      animateTo(value as boolean);
+      setInternalValue(value as boolean);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [value]);
+
+  function animateTo(target: boolean) {
+    Animated.timing(anim, {
+      toValue: target ? 1 : 0,
+      duration: 220,
+      easing: Easing.out(Easing.quad),
+      useNativeDriver: false, // animating layout properties
+    }).start();
+  }
+
+  function toggle() {
+    if (disabled) return;
+    const next = !(isControlled ? (value as boolean) : internalValue);
+    if (!isControlled) setInternalValue(next);
+    animateTo(next);
+    onChange && onChange(next);
+  }
+
+  const metrics = SIZE_MAP[size];
+  const trackWidth = metrics.width;
+  const trackHeight = metrics.height;
+  const thumbSize = metrics.thumb;
+  const padding = metrics.padding;
+  const translateX = anim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [padding, trackWidth - thumbSize - padding],
+  });
+
+  const backgroundColor = anim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [offColor, onColor],
+  });
+
+  const opacity = disabled ? 0.45 : 1;
+
+  return (
+    <Pressable
+      onPress={toggle}
+      accessibilityRole="switch"
+      accessibilityState={{ checked: isControlled ? (value as boolean) : internalValue, disabled }}
+      accessibilityLabel={accessibilityLabel ?? (typeof label === 'string' ? label : 'switch')}
+      disabled={disabled}
+      {...accessibilityProps}
+      style={[styles.container, style]}
+    >
+      {label ? (
+        typeof label === 'string' ? (
+          <Text style={[styles.label, labelStyle]} numberOfLines={1}>
+            {label}
+          </Text>
+        ) : (
+          <View style={{ marginRight: 8 }}>{label}</View>
+        )
+      ) : null}
+
+      <Animated.View
+        style={[
+          styles.track,
+          {
+            width: trackWidth,
+            height: trackHeight,
+            borderRadius: trackHeight / 2,
+            backgroundColor,
+            opacity,
+          },
+        ]}
+      >
+        <Animated.View
+          style={[
+            styles.thumb,
+            {
+              width: thumbSize,
+              height: thumbSize,
+              borderRadius: thumbSize / 2,
+              transform: [{ translateX }],
+              backgroundColor: thumbColor,
+              shadowColor: '#000',
+              shadowOffset: { width: 0, height: 2 },
+              shadowOpacity: 0.15,
+              shadowRadius: 2,
+              elevation: 2,
+            } as ViewStyle,
+          ]}
+        />
+      </Animated.View>
+    </Pressable>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  label: {
+    marginRight: 10,
+    fontSize: 15,
+    color: '#0b213d',
+  },
+  track: {
+    justifyContent: 'center',
+    
+  },
+  thumb: {
+    position: 'absolute',
+    top: 0,
+    margin: 1
+    // left is animated via translateX
+  },
+});
+---------- "src\constants\constants.tsx" ---------- 
+const valores = {versao: 'v0.0.1'}
+export default valores;---------- "src\Context\carrinhoContext.tsx" ---------- 
+import React, { createContext, useState, ReactNode, useContext } from "react";
+
+// Tipo de um produto no carrinho
+export interface ProdutoCarrinho {
+  codigobarras: string;
+  descricao: string;
+  idestoque: number;
+  idproduto: number;
+  imagemcadastro?: number | null;
+  observacoes?: string | null;
+  precovenda: number;
+  quantidade: number;
+  siglaunimedida: string;
+  tipo: string;
+}
+
+// Tipo do contexto
+interface CarrinhoContextType {
+  carrinho: ProdutoCarrinho[];
+  setCarrinho: React.Dispatch<React.SetStateAction<ProdutoCarrinho[]>>;
+}
+
+// Criação do contexto
+const CarrinhoContext = createContext<CarrinhoContextType | undefined>(undefined);
+
+// Provider
+export const CarrinhoProvider = ({ children }: { children: ReactNode }) => {
+  const [carrinho, setCarrinho] = useState<ProdutoCarrinho[]>([]);
+
+  return (
+    <CarrinhoContext.Provider value={{ carrinho, setCarrinho }}>
+      {children}
+    </CarrinhoContext.Provider>
+  );
+};
+
+// Hook para usar o contexto em qualquer componente
+export const useCarrinho = () => {
+  const context = useContext(CarrinhoContext);
+  if (!context) {
+    throw new Error("useCarrinho deve ser usado dentro de um CarrinhoProvider");
+  }
+  return context;
+};
+---------- "src\Context\debugContext.tsx" ---------- 
+import { createContext, ReactNode, useContext, useState } from 'react';
+
+interface debugContextType {
+  debug: false | true;
+  setDebug: (value: boolean) => void;
+}
+
+const debugContext = createContext<debugContextType | undefined>(undefined);
+
+export const DebugProvider = ({ children }: { children: ReactNode }) => {
+
+  const [debug, setDebug] = useState<boolean>(false);
+
+  return <debugContext.Provider value={{debug, setDebug}}>{children}</debugContext.Provider>;
+};
+
+export const useDebug = () => {
+ const context = useContext(debugContext);
+
+ if (!context) {
+    throw new Error("useDebug precisa ser chamado dentro de <DebugProvider />") 
+ }
+ return context;
+}
+
+
+---------- "src\Context\empresaContext.tsx" ---------- 
+import React, { createContext, useState, ReactNode, useContext } from 'react';
+
+
+// Tipo dos dados da empresa
+interface Empresa {
+  idparametro: number | string | undefined;
+  apelido: string | undefined;
+  cnpj: string | undefined;
+  codigoclientepadraobalcao: number | string | undefined;
+  comandasinformarnomecliente: number | string | undefined;
+  endbairro: number | string | undefined;
+  idestoquepadraopedido: number | string | undefined;
+  idformapagtocaixa: number | string | undefined;
+  mesasinformarnomecliente: number | string | undefined;
+  multiestoques: number | string | undefined;
+  nomeempresa: number | string | undefined;
+  numerocomandaincauto: number | string | undefined;
+  quantidademesas: number | string | undefined;
+  taxadeservicogarcom: number | string | undefined;
+  tipocomercio: number | string | undefined;
+  tipomovimentomesascomandas: number | string | undefined;
+  utilizacomanda: number | string | undefined;
+  geraparcelaversapospagamento: string | undefined;
+  tabelaprecosprodutopadrao: number | string | undefined;
+}
+
+// Tipo do contexto
+interface EmpresaContextType {
+  empresa: Empresa | undefined;
+  setEmpresa: React.Dispatch<React.SetStateAction<Empresa | undefined>>;
+}
+
+// Criando o contexto
+const EmpresaContext = createContext<EmpresaContextType | undefined>(undefined);
+
+// Provider
+export const EmpresaProvider = ({ children }: { children: ReactNode }) => {
+  const [empresa, setEmpresa] = useState<Empresa | undefined>({
+    idparametro: undefined,
+apelido: undefined,
+cnpj: undefined,
+codigoclientepadraobalcao: undefined,
+comandasinformarnomecliente: undefined,
+endbairro: undefined,
+idestoquepadraopedido: undefined,
+idformapagtocaixa: undefined,
+mesasinformarnomecliente: undefined,
+multiestoques: undefined,
+nomeempresa: undefined,
+numerocomandaincauto: undefined,
+quantidademesas: undefined,
+taxadeservicogarcom: undefined,
+tipocomercio: undefined,
+tipomovimentomesascomandas: undefined,
+utilizacomanda: undefined,
+geraparcelaversapospagamento: undefined,
+tabelaprecosprodutopadrao: undefined,
+})
+
+  return (
+    <EmpresaContext.Provider value={{ empresa, setEmpresa }}>
+      {children}
+    </EmpresaContext.Provider>
+  );
+};
+
+// Hook para usar contexto em qualquer componente
+export const useEmpresa = () => {
+  const context = useContext(EmpresaContext);
+  if (!context) {
+    throw new Error('useEmpresa deve ser usado dentro de UserProvider');
+  }
+  return context;
+};
+---------- "src\Context\persistirContextos.tsx" ---------- 
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+/**
+ * Salva os contextos `user` e `empresa` no AsyncStorage.
+ * Sempre sobrescreve qualquer valor anterior.
+ */
+export async function persistirContextos(user: any, empresa: any) {
+  try {
+    await AsyncStorage.setItem('@user', JSON.stringify(user || {}));
+    await AsyncStorage.setItem('@empresa', JSON.stringify(empresa || {}));
+    console.log('persistirContextos: contextos salvos com sucesso.');
+  } catch (error) {
+    console.error('persistirContextos: erro ao salvar contextos:', error);
+  }
+}
+---------- "src\Context\userContext.tsx" ---------- 
+import React, { createContext, useState, ReactNode, useContext } from "react";
+
+// Este arquivo cria um contexto global chamado UserContext, que serve para guardar e compartilhar informações do usuário (como usuario, cargo e permissoes) em toda a aplicação React Native.
+
+// O UserProvider envolve a aplicação inteira no App.tsx e fornece os dados do usuário para todos os componentes.
+
+// O useUser é um hook que facilita acessar ou atualizar essas informações em qualquer componente, sem precisar passar props manualmente de um componente para outro.  
+
+// Tipo dos dados do usuário
+interface User {
+  usuario: string | undefined;
+  servername: string | undefined;
+  serverport: string | undefined;
+  pathbanco: string | undefined;
+  idfuncionario: string | number | undefined;
+}
+
+// Tipo do contexto
+interface UserContextType {
+  user: User;
+  setUser: React.Dispatch<React.SetStateAction<User>>;
+}
+
+// Criando o contexto
+const UserContext = createContext<UserContextType | undefined>(undefined);
+
+// Provider
+export const UserProvider = ({ children }: { children: ReactNode }) => {
+  const [user, setUser] = useState<User>({
+    usuario: undefined,
+    servername: undefined,
+    serverport: undefined,
+    pathbanco: undefined,
+    idfuncionario: undefined
+  });
+
+  return (
+    <UserContext.Provider value={{ user, setUser }}>
+      {children}
+    </UserContext.Provider>
+  );
+};
+
+// Hook para usar contexto em qualquer componente
+export const useUser = () => {
+  const context = useContext(UserContext);
+  if (!context) {
+    throw new Error("useUser deve ser usado dentro de UserProvider");
+  }
+  return context;
+};
+---------- "src\Functions\formatDate.tsx" ---------- 
+function formatDate(date: any, adjustDay = 0) {
+    date.setDate(date.getDate() + adjustDay);
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // Janeiro é 0!
+    const year = date.getFullYear();
+
+    return `${day}/${month}/${year}`;
+}
+
+
+export default formatDate;---------- "src\Login\login.tsx" ---------- 
+import {
+  ActivityIndicator,
+  Alert,
+  FlatList,
+  Image,
+  ImageBackground,
+  Modal,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+import { LoginInputNumeric } from '../components/LoginNumericInput';
+import { LoginInputText } from '../components/LoginTextInput';
+import { ButtonCustom } from '../components/Button';
+import Rotas from '../Rotas/Rotas';
+import { useEffect, useState } from 'react';
+import SwitchCustom from '../components/Switch';
+import { useUser } from '../Context/userContext';
+import { useDebug } from '../Context/debugContext';
+import {
+  ConsultaParametros,
+  loginEfetuarLogin,
+  loginValidarAcesso,
+} from '../API/api_rotas';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useEmpresa } from '../Context/empresaContext';
+import { ScrollView } from 'react-native-gesture-handler';
+import { reset } from '../Rotas/NavigatorContainerRef';
+import valores from '../constants/constants';
+import { setApiUrl } from '../API/api';
+
+const Login = ({}: any) => {
+  const { user, setUser } = useUser();
+  const [usuario, setusuario] = useState('');
+  const [senha, setSenha] = useState('');
+  const [CNPJ, setCNPJ] = useState('');
+  const [configContador, setConfigContador] = useState(0);
+  const { debug, setDebug } = useDebug();
+  const [gravarCredenciais, setgravarCredenciais] = useState(false);
+  const [isloading, setisloading] = useState(false);
+  const [modalParametrosVisivel, setModalParametrosVisivel] = useState(false);
+  const [parametros, setParametros] = useState([] as any[]);
+  const [idparametroselecionado, setidparametroselecionado] = useState('');
+  const { empresa, setEmpresa } = useEmpresa();
+  const [apiURL, setapiurlchange] = useState('');
+
+  useEffect(() => {
+    async function getParams() {
+      const defaultgravarcredenciais = await AsyncStorage.getItem(
+        'defaultgravarcredenciais',
+      );
+      const savedUrl = await AsyncStorage.getItem('API_URL');
+      const CNPJsalvo = await AsyncStorage.getItem('CNPJ');
+      const usuariosalvo = await AsyncStorage.getItem('usuario');
+      const senhasalvo = await AsyncStorage.getItem('senha');
+
+      setCNPJ(CNPJsalvo || '');
+      setusuario(usuariosalvo || '');
+      setSenha(senhasalvo || '');
+      setapiurlchange(savedUrl ?? '');
+      setgravarCredenciais(defaultgravarcredenciais ? true : false);
+    }
+
+    getParams();
+  }, []);
+
+  async function validarAcesso() {
+    try {
+      setisloading(true);
+      const responseValidarCNPJ = await loginValidarAcesso({
+        cnpj: CNPJ,
+        ambiente: 'producao',
+      });
+
+      console.log(
+        'resposta validarCNPJ: ',
+        JSON.stringify(responseValidarCNPJ.data[0]),
+      );
+
+      const servername = responseValidarCNPJ.data[0].servername;
+      const serverport = responseValidarCNPJ.data[0].serverport;
+      const pathbanco = responseValidarCNPJ.data[0].pathbanco;
+
+      const responseEfetuarLogin = await loginEfetuarLogin({
+        servername,
+        pathbanco,
+        serverport,
+        idusuario: usuario,
+        senha: senha,
+        versao: valores.versao,
+        versapos: true,
+      });
+
+      console.log(
+        'resposta efetuarLogin: ',
+        JSON.stringify(responseEfetuarLogin.data),
+      );
+
+      const idfuncionario = responseEfetuarLogin.data.idfuncionario;
+
+      if (gravarCredenciais) {
+        AsyncStorage.setItem('CNPJ', CNPJ ? CNPJ : '');
+        AsyncStorage.setItem('usuario', usuario ? usuario : '');
+        AsyncStorage.setItem('senha', senha ? senha : '');
+        AsyncStorage.setItem('defaultgravarcredenciais', 'S');
+      } else {
+        AsyncStorage.removeItem('defaultgravarcredenciais');
+        AsyncStorage.removeItem('CNPJ');
+        AsyncStorage.removeItem('usuario');
+        AsyncStorage.removeItem('senha');
+      }
+
+      setUser({
+        ...user,
+        usuario: usuario,
+        servername,
+        pathbanco,
+        serverport,
+        idfuncionario,
+      });
+
+      const responseConsultaParametros = await ConsultaParametros({
+        servername,
+        serverport,
+        pathbanco,
+        usuario,
+      });
+
+      if (responseConsultaParametros.data.length > 1) {
+        setParametros(responseConsultaParametros.data);
+        setidparametroselecionado('');
+        setModalParametrosVisivel(true);
+        setEmpresa(undefined);
+        setisloading(false);
+        return;
+      }
+      setEmpresa(responseConsultaParametros.data[0]);
+      reset(Rotas.PaginaInicial, { 'origem:': 'login' });
+      setisloading(false);
+    } catch (error) {
+    } finally {
+      setisloading(false);
+    }
+  }
+
+  const renderParametro = ({ item, index }: any) => {
+    return (
+      <View
+        key={item.cnpj}
+        style={[
+          s.empresaItem,
+          idparametroselecionado === JSON.stringify(item.idparametro)
+            ? s.selectedItem
+            : index % 2 === 0
+            ? s.evenItem
+            : s.oddItem,
+        ]}
+      >
+        <TouchableOpacity
+          onPress={() => {
+            setidparametroselecionado(`${item.idparametro}`);
+            setEmpresa(item);
+          }}
+        >
+          <View style={s.empresaContent}>
+            <View style={s.empresaInfo}>
+              <Text style={s.Tx2}>
+                {item.apelido ? item.apelido : item.nomeempresa}
+              </Text>
+              <Text style={s.Tx3}>{item.endbairro}</Text>
+            </View>
+            <Image
+              accessibilityLabel="icone_empresa"
+              style={s.img2}
+              source={require('../assets/Images/iconeEmpresa.png')}
+            />
+          </View>
+        </TouchableOpacity>
+      </View>
+    );
+  };
+
+  return (
+    <View style={s.mainView}>
+      <ImageBackground
+        source={require('../assets/Images/wallpaper3.png')}
+        style={s.backgroundImage}
+        resizeMode="cover"
+      >
+        <Text style={s.txtversao}>{valores.versao}</Text>
+        {debug && (
+          <View style={s.debugview}>
+            {/* Empresa Context */}
+            <ScrollView style={s.empresacontextscroll}>
+              <View style={s.empresacontextview}>
+                <Text style={s.empresacontexttext}>EmpresaContext:</Text>
+                {Object.entries(empresa || {}).map(([key, value]) => (
+                  <Text key={key} style={s.empresacontextitemmaptext}>
+                    {key}: {String(value)}
+                  </Text>
+                ))}
+              </View>
+            </ScrollView>
+
+            {/* User Context */}
+            <ScrollView style={s.empresacontextscroll}>
+              <View style={s.empresacontextview}>
+                <Text style={s.empresacontexttext}>UserContext:</Text>
+                {Object.entries(user).map(([key, value]) => (
+                  <Text key={key} style={s.empresacontextitemmaptext}>
+                    {key}: {String(value)}
+                  </Text>
+                ))}
+              </View>
+            </ScrollView>
+          </View>
+        )}
+        <Modal
+          visible={modalParametrosVisivel}
+          transparent
+          animationType="fade"
+          onRequestClose={() => setModalParametrosVisivel(false)}
+          style={s.modalParametros}
+        >
+          <View style={s.modalBackground}>
+            <View style={s.modalContent}>
+              <Text style={[s.Tx1, s.headerText]}>Selecione a empresa</Text>
+              <FlatList
+                data={parametros}
+                renderItem={renderParametro}
+                keyExtractor={item => item.cnpj}
+                showsVerticalScrollIndicator={false}
+                style={s.flatlistParametro}
+              />
+
+              <View style={s.viewBotoesModalParametros}>
+                <TouchableOpacity
+                  onPress={() => {
+                    setParametros([]);
+                    setModalParametrosVisivel(false);
+                    setEmpresa(undefined);
+                  }}
+                >
+                  <Text style={s.txtCancelar}>Cancelar</Text>
+                </TouchableOpacity>
+                <ButtonCustom
+                  title="Continuar"
+                  onPress={() => {
+                    if (empresa?.cnpj) {
+                      reset(Rotas.PaginaInicial);
+                      setModalParametrosVisivel(false);
+                    } else {
+                      Alert.alert('Selecione uma empresa.');
+                    }
+                  }}
+                />
+              </View>
+            </View>
+          </View>
+        </Modal>
+        <View style={s.mainContainer}>
+          <View style={s.logoView}>
+            <TouchableOpacity
+              onLongPress={() => {
+                setConfigContador(0);
+              }}
+              onPress={() => {
+                setConfigContador(configContador + 1);
+              }}
+            >
+              <Image
+                style={s.logoImage}
+                source={require('../assets/Images/VersaPOSlogo.png')}
+                resizeMode="contain"
+              />
+            </TouchableOpacity>
+          </View>
+
+          {configContador > 5 && (
+            <View>
+              {usuario === 'master' && (
+                <SwitchCustom
+                  label={'Debug'}
+                  style={s.switch}
+                  value={debug}
+                  onChange={() => {
+                    setDebug(!debug);
+                  }}
+                />
+              )}
+              <LoginInputText
+                value={apiURL}
+                onChangeText={setapiurlchange}
+                label={'API'}
+                placeholder={'Endereço da API'}
+              />
+              <View style={{ flexDirection: 'row' }}>
+                <ButtonCustom
+                  title="Salvar"
+                  onPress={() => {
+                    setApiUrl(apiURL);
+                  }}
+                  style={{ marginTop: 5 }}
+                />
+                <ButtonCustom
+                  title="Limpar"
+                  onPress={() => {
+                    setapiurlchange('');
+                    setApiUrl('');
+                  }}
+                  style={{ backgroundColor: 'red', marginTop: 5 }}
+                />
+              </View>
+            </View>
+          )}
+
+          <LoginInputNumeric
+            label={'CNPJ'}
+            value={CNPJ}
+            onChangeText={setCNPJ}
+          />
+
+          <LoginInputText
+            label={'Usuário'}
+            value={usuario}
+            onChangeText={setusuario}
+            style={s.inputs}
+          />
+
+          <LoginInputText
+            label={'Senha'}
+            hideview
+            value={senha}
+            onChangeText={setSenha}
+            style={s.inputs}
+          />
+          <SwitchCustom
+            style={s.gravarSwitch}
+            value={gravarCredenciais}
+            onChange={setgravarCredenciais}
+            label={'Gravar credenciais de acesso'}
+          />
+          {isloading && <ActivityIndicator size={'small'} />}
+          <ButtonCustom
+            title="Acessar"
+            onPress={() => {
+              setisloading(true);
+              if (!usuario || !CNPJ || !senha) {
+                Alert.alert('Preencha todos os campos!');
+                setisloading(false);
+                return;
+              }
+
+              validarAcesso();
+            }}
+            style={s.buttonAcessar}
+          />
+        </View>
+      </ImageBackground>
+    </View>
+  );
+};
+
+const s = StyleSheet.create({
+  mainView: {
+    flex: 1,
+  },
+  backgroundImage: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  mainContainer: {
+    width: 300,
+    paddingBottom: 10,
+    backgroundColor: 'white',
+    borderRadius: 12,
+  },
+
+  logoImage: {
+    width: 200,
+    height: 60,
+  },
+  logoView: {
+    width: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 10,
+  },
+  buttonAcessar: {
+    marginTop: 30,
+  },
+  inputs: { marginTop: 15 },
+  switchView: {
+    flexDirection: 'row',
+  },
+  switch: {},
+  gravarSwitch: { alignSelf: 'center', marginTop: 15 },
+  modalParametros: {
+    backgroundColor: 'transparent',
+  },
+  modalBackground: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContent: {
+    backgroundColor: '#fff',
+    margin: 20,
+    borderRadius: 10,
+    elevation: 5,
+    minWidth: '80%',
+  },
+  empresaItem: {
+    width: '95%',
+    alignSelf: 'center',
+    padding: 12,
+  },
+  selectedItem: {
+    backgroundColor: '#E3F2FD',
+  },
+  evenItem: {
+    backgroundColor: '#F5F5F5',
+  },
+  oddItem: {
+    backgroundColor: 'white',
+  },
+  empresaContent: {
+    width: '100%',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  empresaInfo: {
+    justifyContent: 'flex-start',
+  },
+  Tx2: {
+    color: '#3562bc',
+    fontSize: 18,
+    textAlign: 'left',
+  },
+  Tx3: {
+    color: '#3562bc',
+    opacity: 0.7,
+    fontSize: 10,
+    textAlign: 'left',
+  },
+  img2: {
+    alignSelf: 'center',
+    width: 32,
+    height: 32,
+    resizeMode: 'contain',
+  },
+  flatlistParametro: { flexGrow: 0 },
+  viewBotoesModalParametros: {
+    marginVertical: 10,
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'center',
+  },
+  txtCancelar: {
+    color: '#888888ff',
+  },
+  Tx1: {
+    color: '#3562bc',
+    fontSize: 22,
+    fontWeight: 'bold',
+  },
+  headerText: {
+    alignSelf: 'center',
+    marginVertical: 3,
+  },
+  txtversao: { position: 'absolute', bottom: 0, color: 'white' },
+  empresacontextview: { backgroundColor: 'white', padding: 10 },
+  empresacontexttext: { fontWeight: 'bold', marginBottom: 5 },
+  empresacontextscroll: { flex: 1, marginLeft: 5 },
+  empresacontextitemmaptext: { marginBottom: 2 },
+  debugview: {
+    maxHeight: '20%',
+    width: '100%',
+    flexDirection: 'row',
+    marginVertical: 10,
+  },
+});
+
+export { Login };
+---------- "src\Mesas\GrupoMestre.tsx" ---------- 
+import { Image, StyleSheet, TouchableOpacity, View } from 'react-native';
+import Cabecalho from '../components/Cabecalho';
+import { useEffect, useState } from 'react';
+import Rotas from '../Rotas/Rotas';
+import Carrinho from '../components/Carrinho';
+import { useEmpresa } from '../Context/empresaContext';
+import { useUser } from '../Context/userContext';
+import { ConsultaGrupoProdutoMestre } from '../API/api_rotas';
+import { reset } from '../Rotas/NavigatorContainerRef';
+
+
+const GruposMestre = ({ route }: any) => {
+  const [gruposMestre, setGruposMestre] = useState([] as any[]);
+const [carrinhoAberto, setCarrinhoAberto] = useState(false)
+  const { empresa } = useEmpresa();
+  const { user } = useUser();
+  useEffect(() => {
+    async function getParams() {
+      const servername = user.servername;
+      const serverport = user.serverport;
+      const pathbanco = user.pathbanco;
+      const idempresa = empresa?.idparametro;
+
+      if (servername && serverport && pathbanco) {
+        const resultado = await ConsultaGrupoProdutoMestre({
+          servername,
+          serverport,
+          pathbanco,
+          idempresa,
+        });
+
+        setGruposMestre(resultado.data);
+      } else {
+        setGruposMestre([]);
+      }
+    }
+    getParams();
+  }, []);
+
+  return (
+    <View style={s.MainView}>
+      {/* <Text>{JSON.stringify(route.params)}</Text> */}
+      <Cabecalho
+        voltarFunction={() => {
+          reset(Rotas.Mesa, {
+            statusmesa: route.params?.statusmesa,
+            nummesa: route.params?.nummesa,
+            idmovimento: route.params?.idmovimento,
+          });
+        }}
+      />
+
+      <View style={s.Body}>
+        {gruposMestre
+          .filter(grupo => grupo.tipo)
+          .map((grupoMestre, index) => (
+            <TouchableOpacity
+              key={index}
+              onPress={() => {
+                reset(Rotas.GrupoProduto, {
+                  statusmesa: route.params?.statusmesa,
+                  nummesa: route.params?.nummesa,
+                  idmovimento: route.params?.idmovimento,
+                  idgrupoprodutomestre: grupoMestre.idgrupoprodutomestre,
+                });
+              }}
+            >
+              <Image
+                style={s.imageStyle}
+                alt={'img'}
+                source={
+                  grupoMestre.tipo === 'A'
+                    ? require('../assets/Images/Alimentos.png')
+                    : grupoMestre.tipo === 'B'
+                    ? require('../assets/Images/Bebidas.png')
+                    : require('../assets/Images/Servicos.png')
+                }
+              />
+            </TouchableOpacity>
+          ))}
+      </View>
+
+      <Carrinho
+        nummesa={route?.params?.nummesa}
+        statusmesa={route?.params?.statusmesa}
+        idmovimento={route.params?.idmovimento}
+        carrinhoAberto={carrinhoAberto}
+        setCarrinhoAberto={setCarrinhoAberto}
+      />
+    </View>
+  );
+};
+
+const s = StyleSheet.create({
+  MainView: {
+    flex: 1,
+  },
+  imageStyle: { alignSelf: 'center', marginTop: 5, width: 355, height: 110 },
+  Body: {
+    flex: 1,
+  },
+});
+
+export default GruposMestre;
+---------- "src\Mesas\GrupoProduto.tsx" ---------- 
+import {
+  FlatList,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+import Cabecalho from '../components/Cabecalho';
+import { useEffect, useState } from 'react';
+import Rotas from '../Rotas/Rotas';
+import GrupoProdutoCard from '../components/GrupoProdutoCard';
+import Carrinho from '../components/Carrinho';
+import { useEmpresa } from '../Context/empresaContext';
+import { useUser } from '../Context/userContext';
+import { ConsultaGrupoProduto } from '../API/api_rotas';
+import { reset } from '../Rotas/NavigatorContainerRef';
+
+const GruposProduto = ({ route }: any) => {
+  const [grupos, setGrupos] = useState([] as any[]);
+
+  function extrairNomeArquivo(caminho: any) {
+    // Encontrar a última ocorrência da barra invertida (\) no caminho
+    try {
+      let ultimoIndiceBarra = caminho.lastIndexOf('\\');
+
+      if (ultimoIndiceBarra !== -1) {
+        // Extrair o nome do arquivo a partir do último índice da barra + 1 até o final
+        let nomeArquivo = caminho.substring(ultimoIndiceBarra + 1);
+        //console.log('Encontrou: ', nomeArquivo)
+        return nomeArquivo;
+      } else {
+        // Se não encontrar a barra invertida, retorna o caminho original
+        return '';
+      }
+    } catch {
+      return '';
+    }
+  }
+
+  const imgAgua = require('../assets/Images/CMD-iconAgua.png');
+  const imgBolos = require('../assets/Images/CMD-iconBolos.png');
+  const imgBombom = require('../assets/Images/CMD-iconbombom.png');
+  const imgCafe = require('../assets/Images/CMD-iconCafe.png');
+  const imgCafeManha = require('../assets/Images/CMD-iconCafeManha.png');
+  const imgCastanha = require('../assets/Images/CMD-iconCastanha.png');
+  const imgCervejas = require('../assets/Images/CMD-iconCervejas.png');
+  const imgChas = require('../assets/Images/CMD-iconChas.png');
+  const imgCigarros = require('../assets/Images/CMD-iconCigarros.png');
+  const imgCrepe = require('../assets/Images/CMD-iconCrepe.png');
+  const imgCuscuz = require('../assets/Images/CMD-iconCuscuz.png');
+  const imgDestilados = require('../assets/Images/CMD-iconDestilados.png');
+  const imgDrinks = require('../assets/Images/CMD-iconDrinks.png');
+  const imgFrios = require('../assets/Images/CMD-iconFrios.png');
+  const imgPaes = require('../assets/Images/CMD-iconPaes.png');
+  const imgPetisco = require('../assets/Images/CMD-iconPetisco.png');
+  const imgPizza = require('../assets/Images/CMD-iconPizza.png');
+  const imgPorcoes = require('../assets/Images/CMD-iconPorcoes.png');
+  const imgRefeicoes = require('../assets/Images/CMD-iconRefeicoes.png');
+  const imgRefrigerante = require('../assets/Images/CMD-iconRefrigerante.png');
+  const imgSalgados = require('../assets/Images/CMD-iconSalgados.png');
+  const imgSandwitch = require('../assets/Images/CMD-iconSandwitch.png');
+  const imgSobremesas = require('../assets/Images/CMD-iconSobremesas.png');
+  const imgSopa = require('../assets/Images/CMD-iconSopa.png');
+  const imgSorvetes = require('../assets/Images/CMD-iconSorvetes.png');
+  const imgSucos = require('../assets/Images/CMD-iconSucos.png');
+  const imgSushi = require('../assets/Images/CMD-iconSushi.png');
+  const imgTapioca = require('../assets/Images/CMD-iconTapioca.png');
+  const imgVinhos = require('../assets/Images/CMD-iconVinhos.png');
+  const imgSemImagem = require('../assets/Images/CMD-iconSemImagem.png');
+
+  const { empresa } = useEmpresa();
+  const { user } = useUser();
+  const [carrinhoAberto, setCarrinhoAberto] = useState(false);
+
+  useEffect(() => {
+    async function getParams() {
+      const servername = user.servername;
+      const serverport = user.serverport;
+      const pathbanco = user.pathbanco;
+      const idempresa = empresa?.idparametro;
+
+      if (servername && serverport && pathbanco) {
+        const resultado = await ConsultaGrupoProduto({
+          servername,
+          serverport,
+          pathbanco,
+          idempresa,
+          grupomestre: route.params?.idgrupoprodutomestre,
+        });
+
+        setGrupos(resultado.data);
+      } else {
+        setGrupos([]);
+      }
+    }
+    getParams();
+  }, []);
+
+  const renderItem = ({ item }: any) => {
+    return (
+      <TouchableOpacity
+        style={s.touchClickGrupo}
+        key={item.descricao}
+        onPress={() => {
+          reset(Rotas.ProdutosInserirMesa, {
+            statusmesa: route.params?.statusmesa,
+            nummesa: route.params?.nummesa,
+            idmovimento: route.params?.idmovimento,
+            idgrupoproduto: item.idgrupoproduto,
+            idgrupoprodutomestre: route.params?.idgrupoprodutomestre,
+          });
+        }}
+      >
+        <GrupoProdutoCard
+          key={item.descricao}
+          imagem={
+            extrairNomeArquivo(item.pathimagem) === 'CMD-iconAgua.png'
+              ? imgAgua
+              : extrairNomeArquivo(item.pathimagem) === 'CMD-iconBolos.png'
+              ? imgBolos
+              : extrairNomeArquivo(item.pathimagem) === 'CMD-iconBombom.png'
+              ? imgBombom
+              : extrairNomeArquivo(item.pathimagem) === 'CMD-iconCafe.png'
+              ? imgCafe
+              : extrairNomeArquivo(item.pathimagem) === 'CMD-iconCafeManha.png'
+              ? imgCafeManha
+              : extrairNomeArquivo(item.pathimagem) === 'CMD-iconCastanha.png'
+              ? imgCastanha
+              : extrairNomeArquivo(item.pathimagem) === 'CMD-iconCervejas.png'
+              ? imgCervejas
+              : extrairNomeArquivo(item.pathimagem) === 'CMD-iconChas.png'
+              ? imgChas
+              : extrairNomeArquivo(item.pathimagem) === 'CMD-iconCigarros.png'
+              ? imgCigarros
+              : extrairNomeArquivo(item.pathimagem) === 'CMD-iconCrepe.png'
+              ? imgCrepe
+              : extrairNomeArquivo(item.pathimagem) === 'CMD-iconCuscuz.png'
+              ? imgCuscuz
+              : extrairNomeArquivo(item.pathimagem) === 'CMD-iconDestilados.png'
+              ? imgDestilados
+              : extrairNomeArquivo(item.pathimagem) === 'CMD-iconDrinks.png'
+              ? imgDrinks
+              : extrairNomeArquivo(item.pathimagem) === 'CMD-iconFrios.png'
+              ? imgFrios
+              : extrairNomeArquivo(item.pathimagem) === 'CMD-iconPaes.png'
+              ? imgPaes
+              : extrairNomeArquivo(item.pathimagem) === 'CMD-iconPetisco.png'
+              ? imgPetisco
+              : extrairNomeArquivo(item.pathimagem) === 'CMD-iconPizza.png'
+              ? imgPizza
+              : extrairNomeArquivo(item.pathimagem) === 'CMD-iconPorcoes.png'
+              ? imgPorcoes
+              : extrairNomeArquivo(item.pathimagem) === 'CMD-iconRefeicoes.png'
+              ? imgRefeicoes
+              : extrairNomeArquivo(item.pathimagem) ===
+                'CMD-iconRefrigerante.png'
+              ? imgRefrigerante
+              : extrairNomeArquivo(item.pathimagem) === 'CMD-iconSalgados.png'
+              ? imgSalgados
+              : extrairNomeArquivo(item.pathimagem) === 'CMD-iconSandwitch.png'
+              ? imgSandwitch
+              : extrairNomeArquivo(item.pathimagem) === 'CMD-iconSobremesas.png'
+              ? imgSobremesas
+              : extrairNomeArquivo(item.pathimagem) === 'CMD-iconSopa.png'
+              ? imgSopa
+              : extrairNomeArquivo(item.pathimagem) === 'CMD-iconSorvetes.png'
+              ? imgSorvetes
+              : extrairNomeArquivo(item.pathimagem) === 'CMD-iconSucos.png'
+              ? imgSucos
+              : extrairNomeArquivo(item.pathimagem) === 'CMD-iconSushi.png'
+              ? imgSushi
+              : extrairNomeArquivo(item.pathimagem) === 'CMD-iconTapioca.png'
+              ? imgTapioca
+              : extrairNomeArquivo(item.pathimagem) === 'CMD-iconVinhos.png'
+              ? imgVinhos
+              : imgSemImagem
+          }
+          descricao={item.descricao}
+        />
+      </TouchableOpacity>
+    );
+  };
+
+  return (
+    <View style={s.MainView}>
+      {/* <Text>{JSON.stringify(route?.params)}</Text> */}
+      <Cabecalho
+        voltarFunction={() => {
+          reset(Rotas.GrupoMestre, {
+            statusmesa: route.params?.statusmesa,
+            nummesa: route.params?.nummesa,
+            idmovimento: route.params?.idmovimento,
+          });
+        }}
+      />
+      <FlatList
+        data={grupos}
+        renderItem={renderItem}
+        numColumns={2}
+        ListFooterComponent={
+          <>
+            <View style={s.viewbottom} />
+          </>
+        }
+      />
+      <Carrinho
+        nummesa={route?.params?.nummesa}
+        statusmesa={route?.params?.statusmesa}
+        idmovimento={route.params?.idmovimento}
+        carrinhoAberto={carrinhoAberto}
+        setCarrinhoAberto={setCarrinhoAberto}
+      />
+    </View>
+  );
+};
+
+const s = StyleSheet.create({
+  MainView: {
+    flex: 1,
+  },
+  renderGruposParView: { flexDirection: 'row' },
+  touchClickGrupo: { width: '50%' },
+  viewbottom: { height: 30 },
+});
+
+export default GruposProduto;
+---------- "src\Mesas\MapaMesas.tsx" ---------- 
+import {
+  ActivityIndicator,
+  Alert,
+  FlatList,
+  Modal,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+import colors from '../ThemeContext/colors';
+import { ButtonCustom } from '../components/Button';
+
+import { useEffect, useState } from 'react';
+import { LoginInputNumeric } from '../components/LoginNumericInput';
+import CardMesa from '../components/CardMesa';
+
+import Rotas from '../Rotas/Rotas';
+import Cabecalho from '../components/Cabecalho';
+import { useDebug } from '../Context/debugContext';
+import { MovimentoPesquisa } from '../API/api_rotas';
+import { useEmpresa } from '../Context/empresaContext';
+import { useUser } from '../Context/userContext';
+import formatDate from '../Functions/formatDate';
+import { reset } from '../Rotas/NavigatorContainerRef';
+
+type MesaProps = {
+  nummesa: any; // ou number, se você souber que é numérico
+  [key: string]: any; // permite múltiplas outras chaves
+};
+
+const MapaMesas = ({  }: any) => {
+  const [pesquisa, setPesquisa] = useState('');
+
+  const { debug } = useDebug();
+
+  const pageSize = 10;
+  const [PaginaAtual, setPaginaAtual] = useState(1);
+  const [MapaMesasDataRender, setMapaMesasDataRender] = useState(
+    [] as MesaProps[],
+  );
+  const [isLoadingMesaLista, setIsloadingMesaLista] = useState(false);
+  const [recarregarMesas, setrecarregarMesas] = useState(0);
+  const [modalParametrosVisivel, setmodalParametrosVisivel] = useState(false);
+
+  const { empresa } = useEmpresa();
+  const { user } = useUser();
+
+  const [inputGerenciarMesa, setinputGerenciarMesa] = useState('');
+
+  const [data, setdata] = useState<MesaProps[]>([]);
+
+  const pagination = (
+    database: MesaProps[],
+    PagAtual: any,
+    tamanhoPagina: any,
+  ) => {
+    const StartIndex = (PagAtual - 1) * tamanhoPagina;
+
+    const endIndex = StartIndex + pageSize;
+
+    if (StartIndex >= database.length) {
+      return [];
+    }
+
+    return database.slice(StartIndex, endIndex);
+  };
+
+  useEffect(() => {
+    async function getParams() {
+      try {
+        setIsloadingMesaLista(true);
+
+        const today = new Date();
+
+        const datainiciomovimentos = formatDate(new Date(today), -1); // Data inicial com dia atual - 1
+        const datafimmovimentos = formatDate(new Date(today)); // Data final com dia atual
+
+        const response = await MovimentoPesquisa({
+          servername: user.servername,
+          serverport: user.serverport,
+          pathbanco: user.pathbanco,
+          idempresa: empresa?.idparametro,
+          order: 'nummesa',
+          valorpesquisamesa: pesquisa,
+          statusmesa: ['R', 'O'],
+          datainiciomovimentos,
+          datafimmovimentos,
+        });
+
+        // Alert.alert('data: ', JSON.stringify(response));
+        setdata(response.data);
+
+        setPaginaAtual(1);
+        const getMesasIniciais = pagination(response.data, 1, pageSize);
+        setMapaMesasDataRender(getMesasIniciais);
+        setIsloadingMesaLista(false);
+      } catch (error) {
+        setIsloadingMesaLista(false);
+      }
+    }
+
+    getParams();
+  }, [recarregarMesas]);
+
+  useEffect(() => {
+    if (!pesquisa) {
+      setrecarregarMesas(r => r + 1);
+      return;
+    }
+
+    const mesasFiltradas = data.filter(
+      mesa => mesa.nummesa === Number(pesquisa),
+    );
+
+    setMapaMesasDataRender(mesasFiltradas);
+  }, [pesquisa]);
+
+  return (
+    <View style={s.MainView}>
+      {/* <Text>{JSON.stringify(route.params)}</Text> */}
+      <Cabecalho
+        showdebug={
+          debug ? String('Qtd renderizada : ' + MapaMesasDataRender.length) : ''
+        }
+        voltarFunction={() => {
+          reset(Rotas.PaginaInicial);
+        }}
+      />
+
+      <View style={s.body}>
+        <LoginInputNumeric
+          value={pesquisa}
+          onChangeText={setPesquisa}
+          placeholder="Pesquisar mesas ocupadas..."
+        />
+        {isLoadingMesaLista && <ActivityIndicator size={'large'} />}
+        <FlatList
+          onEndReachedThreshold={0.7}
+          onEndReached={() => {
+            // console.log('Atualizando lista renderizada...')
+
+            if (isLoadingMesaLista || pesquisa) {
+              console.log(
+                'retornando pois ainda está carregando, ou existe pesquisa em andamento..',
+              );
+              return;
+            }
+
+            setIsloadingMesaLista(true);
+
+            const ConteudoParaAdicionar = pagination(
+              data,
+              PaginaAtual + 1,
+              pageSize,
+            );
+
+            if (ConteudoParaAdicionar.length > 0) {
+              setPaginaAtual(PaginaAtual + 1);
+              setMapaMesasDataRender(prev => [
+                ...prev,
+                ...ConteudoParaAdicionar,
+              ]);
+            }
+
+            setIsloadingMesaLista(false);
+          }}
+          data={MapaMesasDataRender}
+          renderItem={({ item }) => {
+            return (
+              <View style={s.itemflatlist}>
+                <TouchableOpacity
+                  onPress={() => {
+                    const dataenviar = new Date();
+
+                    reset(Rotas.Mesa, {
+                      idmovimento: item.idmovimento,
+                      nummesa: item.nummesa,
+                      data: `${dataenviar}`,
+                      statusmesa: item.statusmesa,
+                    });
+                  }}
+                >
+                  <CardMesa mesa={item} />
+                </TouchableOpacity>
+              </View>
+            );
+          }}
+          keyExtractor={(item, index) => `${item.numero}-${index}`}
+          numColumns={2}
+        />
+      </View>
+      <View style={s.footer}>
+        <ButtonCustom
+          title="Gerenciar Mesa"
+          onPress={() => {
+            setmodalParametrosVisivel(true);
+          }}
+        />
+      </View>
+
+      <Modal
+        visible={modalParametrosVisivel}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setmodalParametrosVisivel(false)}
+        style={{}}
+      >
+        <TouchableOpacity
+          style={s.modalBackGround}
+          onPress={() => {setmodalParametrosVisivel(false);
+            setinputGerenciarMesa('')
+          }}
+        >
+          <TouchableOpacity activeOpacity={1}>
+            <View style={s.modalCard}>
+              <Text style={s.modalTitle}>Digite o número da mesa:</Text>
+
+              <View style={s.inputgerenciarmesa}>
+                <TextInput
+                  placeholder={
+                    '1, 2, 3 ...' +
+                    String(Number(empresa?.quantidademesas) - 1) +
+                    ', ' +
+                    String(empresa?.quantidademesas)
+                  }
+                  keyboardType="numeric"
+                  value={inputGerenciarMesa}
+                  onChangeText={setinputGerenciarMesa}
+                />
+              </View>
+
+              <ButtonCustom
+                style={
+                  data.some(item => item.nummesa === Number(inputGerenciarMesa))
+                    ? s.ButtonMesaOcupada
+                    : s.ButtonMesaLivre
+                }
+                title={
+                  data.some(item => item.nummesa === Number(inputGerenciarMesa))
+                    ? 'Operar na mesa'
+                    : 'Abrir nova mesa'
+                }
+                onPress={() => {
+                  if (!inputGerenciarMesa){
+                    Alert.alert("Alerta", "digite o número da mesa!")
+                    return;
+                  }
+                  setmodalParametrosVisivel(false);
+                  
+                  const dataenviar = new Date();
+
+                  // procura mesa na lista
+                  const mesaExistente = data.find(
+                    item => item.nummesa === Number(inputGerenciarMesa),
+                  );
+
+                  if (mesaExistente) {
+                    // se já existe, navegar com os dados dela
+                    reset(Rotas.Mesa, {
+                      idmovimento: mesaExistente.idmovimento,
+                      nummesa: mesaExistente.nummesa,
+                      data: `${dataenviar}`,
+                      statusmesa: mesaExistente.statusmesa,
+                    });
+                  } else {
+                    // se não existe, criar nova mesa
+                    reset(Rotas.Mesa, {
+                      idmovimento: '',
+                      nummesa: inputGerenciarMesa,
+                      data: `${dataenviar}`,
+                      statusmesa: 'L',
+                    });
+                  }
+                }}
+              />
+            </View>
+          </TouchableOpacity>
+        </TouchableOpacity>
+      </Modal>
+    </View>
+  );
+};
+
+const s = StyleSheet.create({
+  MainView: {
+    flex: 1,
+  },
+  Header: {
+    width: '100%',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    borderBottomColor: colors.CinzaClaro,
+    borderBottomWidth: 1,
+  },
+  logoImage: {
+    width: 200,
+    height: 60,
+  },
+  body: {
+    flex: 1,
+    paddingTop: 10,
+  },
+  footer: {
+    height: 80,
+    borderTopWidth: 1,
+    borderTopColor: colors.CinzaClaro,
+    justifyContent: 'center',
+  },
+  itemflatlist: {
+    width: '50%',
+    alignItems: 'center',
+    marginVertical: 5,
+  },
+  modalBackGround: {
+    flex: 1,
+    backgroundColor: 'rgba(1, 1, 1, 0.26)',
+    paddingHorizontal: 10,
+    justifyContent: 'center',
+  },
+  modalCard: {
+    width: '100%',
+    borderRadius: 10,
+    backgroundColor: '#ffff',
+    padding: 10,
+  },
+  modalTitle: {
+    marginVertical: 16,
+    marginLeft: 10,
+    fontSize: 18,
+    color: colors.AzulMaisClaro,
+    fontWeight: 'bold',
+  },
+  inputgerenciarmesa: {
+    borderWidth: 1,
+    borderColor: colors.CinzaClaro,
+    marginBottom: 20,
+    borderRadius: 6,
+  },
+  ButtonMesaOcupada: {
+    backgroundColor: 'red',
+  },
+  ButtonMesaLivre: { backgroundColor: 'green' },
+});
+
+export default MapaMesas;
+---------- "src\Mesas\Mesa.tsx" ---------- 
+import {
+  Alert,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+import Cabecalho from '../components/Cabecalho';
+import CardNumMesa from '../components/CardNumMesa';
+import CardParceiro from '../components/CardParceiro';
+import CardParceiroSelecionado from '../components/CardParceiroSelecionado';
+import { useCallback, useEffect, useState } from 'react';
+import { CardMesaInfo } from '../components/CardsMesaInfo';
+import CardMesaDisponivel from '../components/CardMesaDisponível';
+import CardItensMovimento from '../components/CardItensMovimento';
+import CardTrasnfetirImprimir from '../components/CardTrasnfetirImprimir';
+import Rotas from '../Rotas/Rotas';
+import { useUser } from '../Context/userContext';
+import {
+  ConsultaFornecedor,
+  ItemmovimentoPesquisaitemmovimentocomandas,
+  ConsultaMovimentoPagamento,
+  RemoveItemMovimento,
+} from '../API/api_rotas';
+import { useEmpresa } from '../Context/empresaContext';
+import CardReceberPagamento from '../components/CardReceberPagamento';
+import { reset } from '../Rotas/NavigatorContainerRef';
+import { useCarrinho } from '../Context/carrinhoContext';
+import ModalSelecionarFornecedor from '../components/ModalSelecionarFornecedor';
+
+const Mesa = ({ route }: any) => {
+  const { setCarrinho } = useCarrinho();
+  const [nomeFornecedor, setnomeFornecedor] = useState('');
+  const [tipoFornecedor, settipoFornecedor] = useState('');
+  const [cnpjFornecedor, setcnpjFornecedor] = useState('');
+  const [idmovimento] = useState(route.params?.idmovimento);
+  const [nomeCliente, setNomeCliente] = useState('');
+  const [nomeGarcom, setnomeGarcom] = useState('');
+  const [dataAbertura, setdataAbertura] = useState('');
+  const [tempoUtilizacao, settempoUtilizacao] = useState('');
+  const [Taxa, setTaxa] = useState(0.0);
+  const [Consumacao, setConsumacao] = useState(0.0);
+  const [totalMesa, settotalMesa] = useState(0.0);
+  // const [totalMesaParcial, settotalMesaParcial] = useState(0.0);
+  const { user } = useUser();
+  const { empresa } = useEmpresa();
+
+  const [itensmovimento, setitensmovimento] = useState([] as any[]);
+
+  // formatar data "2025-09-26T13:45:00.000Z" em "26/09/2025 13:45"
+  const formatarData = useCallback((dataString: any) => {
+    const data = new Date(dataString);
+
+    const adicionarZero = (numero: number) =>
+      numero < 10 ? `0${numero}` : numero;
+
+    const dia = adicionarZero(data.getUTCDate());
+    const mes = adicionarZero(data.getUTCMonth() + 1);
+    const ano = data.getUTCFullYear();
+    const horas = adicionarZero(data.getUTCHours());
+    const minutos = adicionarZero(data.getUTCMinutes());
+
+    return `${dia}/${mes}/${ano} ${horas}:${minutos}`;
+  }, []);
+
+  const convertToHHMMSS = useCallback((decimalTime: any) => {
+    // Converte a parte decimal (dias) para horas
+    const totalSeconds = Math.floor(decimalTime * 24 * 3600); // 24 hours * 3600 seconds
+
+    const hours = Math.floor(totalSeconds / 3600); // Converte para horas
+    const minutes = Math.floor((totalSeconds % 3600) / 60); // Converte o restante para minutos
+    const seconds = totalSeconds % 60; // O restante para segundos
+
+    // Formata para HH:MM:SS
+    const formattedTime = [
+      String(hours).padStart(2, '0'),
+      String(minutes).padStart(2, '0'),
+      String(seconds).padStart(2, '0'),
+    ].join(':');
+
+    return formattedTime;
+  }, []);
+
+  const [pagamentos, setpagamentos] = useState([]);
+  const [visibleModalFornecedor, setvisibleModalFornecedor] = useState(false);
+
+  useEffect(() => {
+    async function getParams() {
+      const servername = user.servername;
+      const serverport = user.serverport;
+      const pathbanco = user.pathbanco;
+      const idempresa = empresa?.idparametro;
+      const tipomovimento = empresa?.tipomovimentomesascomandas;
+
+      if (servername && serverport && pathbanco && idempresa && idmovimento) {
+        const result = await ConsultaFornecedor({
+          serverport: serverport,
+          servername: servername,
+          pathbanco: pathbanco,
+          idmovimento: idmovimento,
+          idempresa: empresa?.idparametro,
+        });
+
+        setNomeCliente(result.data[0].nomeCliente);
+        setnomeFornecedor(
+          result.data[0].nomefornecedor ? result.data[0].nomefornecedor : '',
+        );
+        setcnpjFornecedor(
+          result.data[0].cnpjfornecedor ? result.data[0].cnpjfornecedor : '',
+        );
+        settipoFornecedor(
+          result.data[0].tipofornecedor ? result.data[0].tipofornecedor : '',
+        );
+        setnomeGarcom(result.data[0].nomefuncionario);
+        setdataAbertura(formatarData(result.data[0].datamovimento));
+        settempoUtilizacao(convertToHHMMSS(result.data[0].tempoutilizacao));
+        setTaxa(
+          result.data[0].valorservicomesa ? result.data[0].valorservicomesa : 0,
+        );
+        setConsumacao(
+          result.data[0].qtepessoasmesa
+            ? (result.data[0].totalmovimento +
+                (result.data[0].valorservicomesa
+                  ? result.data[0].valorservicomesa
+                  : 0)) /
+                result.data[0].qtepessoasmesa
+            : 0,
+        );
+        settotalMesa(
+          result.data[0].totalmovimento ? result.data[0].totalmovimento : 0,
+        );
+        // settotalMesaParcial(result.data[0].totalmovimentobruto ? result.data[0].totalmovimentobruto : 0)
+
+        const result2 = await ItemmovimentoPesquisaitemmovimentocomandas({
+          servername: servername,
+          serverport: serverport,
+          pathbanco: pathbanco,
+          idmovimento: idmovimento,
+          tipomovimento: tipomovimento,
+          idempresa: idempresa,
+        });
+
+        // Alert.alert('Resultado:', JSON.stringify(result2.data));
+
+        setitensmovimento(result2.data);
+
+        if (empresa.geraparcelaversapospagamento === 'S') {
+          const result3 = await ConsultaMovimentoPagamento({
+            serverport: serverport,
+            servername: servername,
+            pathbanco: pathbanco,
+            idmovimento: idmovimento,
+            idempresa: idempresa,
+          });
+
+          // Alert.alert("pagamentos retornados:", JSON.stringify(result3.data))
+          setpagamentos(result3.data);
+        }
+      }
+    }
+
+    getParams();
+  }, [route.params?.data]);
+
+  async function removerItem(iditemmovimento: any) {
+    console.log('Função ativada!');
+
+    const servername = user.servername;
+    const serverport = user.serverport;
+    const pathbanco = user.pathbanco;
+    const idempresa = empresa?.idparametro;
+    const idusuario = user.usuario;
+
+    const resultado = await RemoveItemMovimento({
+      servername: servername,
+      serverport: serverport,
+      pathbanco: pathbanco,
+      iditemmovimento: iditemmovimento,
+      idusuario: idusuario,
+      idempresa: idempresa,
+    });
+
+    if (resultado){}
+    const dataenviar = new Date()
+
+    reset(Rotas.Mesa, {
+      idmovimento: idmovimento,
+      nummesa: route?.params?.nummesa,
+      data: `${dataenviar}`,
+      statusmesa: route?.params?.statusmesa,
+    });
+  }
+
+  return (
+    <View style={s.mainView}>
+      {/* <Text></Text> */}
+
+      <Cabecalho
+        voltarFunction={() => {
+          reset(Rotas.MapaMesas);
+        }}
+      />
+
+      <ScrollView
+        style={s.MainScrollView}
+        showsVerticalScrollIndicator={false}
+        showsHorizontalScrollIndicator={false}
+      >
+        <View style={s.CardsMesaView}>
+          <CardNumMesa
+            mesa={{
+              statusmesa: route.params?.statusmesa,
+              nummesa: route.params?.nummesa,
+            }}
+          />
+          {nomeFornecedor ? (
+            <CardParceiroSelecionado
+              fornecedor={{
+                tipofornecedor: tipoFornecedor,
+                nome: nomeFornecedor,
+                cnpj: cnpjFornecedor,
+              }}
+            />
+          ) : (
+            <TouchableOpacity
+              onPress={() => {
+                if (!idmovimento) {
+                  Alert.alert(
+                    'Alerta',
+                    'A mesa deve primeiro ser aberta para depois selecionar o parceiro!',
+                  );
+                  return;
+                }
+                setvisibleModalFornecedor(true);
+              }}
+            >
+              <CardParceiro />
+            </TouchableOpacity>
+          )}
+        </View>
+        {idmovimento ? (
+          <View>
+            <View style={s.ViewMesaInfo}>
+              <CardMesaInfo.Cliente nome={nomeCliente} />
+              <CardMesaInfo.Garcom nome={nomeGarcom} />
+              <CardMesaInfo.Abertura abertura={dataAbertura} />
+              <CardMesaInfo.Utilizacao utilizacao={tempoUtilizacao} />
+              <CardMesaInfo.Taxa taxa={Taxa} />
+              <CardMesaInfo.Consumacao consumacao={Consumacao} />
+            </View>
+            <CardMesaInfo.TotalMesa total={totalMesa} />
+
+            <CardReceberPagamento
+              total={String(
+                (
+                  totalMesa -
+                  pagamentos.reduce(
+                    (soma, pagamento: any) => soma + pagamento.valor,
+                    0,
+                  )
+                ).toFixed(2),
+              ).replace('.', '')}
+              idmovimento={idmovimento}
+              nummesa={route.params?.nummesa}
+            />
+
+            {/* <Text>
+              {String(
+                (
+                  totalMesa -
+                  pagamentos.reduce(
+                    (soma, pagamento: any) => soma + pagamento.valor,
+                    0,
+                  )
+                ).toFixed(2),
+              ).replace('.', '')}
+            </Text> */}
+            {pagamentos.length > 0 && (
+              <View style={s.parcelasView}>
+                <Text style={s.parcelasTitle}>Pagamentos</Text>
+                <View style={s.parcelasTitles}>
+                  <Text style={s.parcelasTitlesText}>Id</Text>
+                  <Text style={s.parcelasTitlesText}>Situação</Text>
+                  <Text style={s.parcelasTitlesText}>Valor</Text>
+                </View>
+                {pagamentos.map((pagamento: any, index: any) => (
+                  <View key={index} style={s.parcelaItemView}>
+                    <Text style={s.parcelaItemText}>
+                      {pagamento.idmovimentopagamento}
+                    </Text>
+                    <Text style={s.parcelaItemText}>Paga</Text>
+                    <Text style={s.parcelaItemText}>
+                      R$ {pagamento.valor.toFixed(2)}
+                    </Text>
+                  </View>
+                ))}
+                <View style={[s.totalItenspagamentoView, { marginTop: 10 }]}>
+                  <Text
+                    style={[s.parcelaItemText, s.texttotalizadorespagamento]}
+                  >
+                    Total pago:
+                  </Text>
+                  <Text style={s.textTotalpagamentos}>
+                    R${' '}
+                    {String(
+                      pagamentos
+                        .reduce(
+                          (soma, pagamento: any) => soma + pagamento.valor,
+                          0,
+                        )
+                        .toFixed(2),
+                    ).replace('.', ',')}
+                  </Text>
+                </View>
+                <View style={[s.totalItenspagamentoView, { marginTop: 10 }]}>
+                  <Text
+                    style={[s.parcelaItemText, s.texttotalizadorespagamento]}
+                  >
+                    Total restante:
+                  </Text>
+                  <Text style={s.textTotalpagamentos}>
+                    R${' '}
+                    {String(
+                      (
+                        totalMesa -
+                        pagamentos.reduce(
+                          (soma, pagamento: any) => soma + pagamento.valor,
+                          0,
+                        )
+                      ).toFixed(2),
+                    ).replace('.', ',')}
+                  </Text>
+                </View>
+              </View>
+            )}
+            {/* <Text>{String(totalMesa.toFixed(2)).replace('.','')}</Text> */}
+          </View>
+        ) : (
+          <CardMesaDisponivel nummesa={route.params?.nummesa} />
+        )}
+
+        {idmovimento && (
+          <CardTrasnfetirImprimir
+            idmovimento={idmovimento}
+            onPressTransferir={() => {}}
+            info={{
+              mesa: route.params?.nummesa,
+              total: totalMesa,
+              itens: itensmovimento,
+              idusuario: user?.usuario,
+              abertura: dataAbertura,
+              utilizacao: tempoUtilizacao,
+              garcom: nomeGarcom,
+              taxa: Taxa,
+            }}
+          />
+        )}
+
+        <CardItensMovimento
+          itensmovimento={itensmovimento}
+          onPressAddItem={() => {
+            setCarrinho([]);
+            reset(Rotas.GrupoMestre, {
+              statusmesa: route.params?.statusmesa,
+              nummesa: route.params?.nummesa,
+              idmovimento: idmovimento,
+            });
+          }}
+          onPressExcluir={removerItem}
+        />
+      </ScrollView>
+
+      <ModalSelecionarFornecedor
+        visible={visibleModalFornecedor}
+        onClose={() => {
+          setvisibleModalFornecedor(false);
+        }}
+        idmovimento={idmovimento}
+        nummesa={route?.params?.nummesa}
+        statusmesa={route?.params?.statusmesa}
+      />
+    </View>
+  );
+};
+
+const s = StyleSheet.create({
+  mainView: {
+    flex: 1,
+  },
+  CardsMesaView: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 5,
+  },
+  MainScrollView: {
+    flex: 1,
+    marginHorizontal: 10,
+  },
+  ViewMesaInfo: {
+    marginTop: 10,
+    marginBottom: 2,
+  },
+  ViewMesaInfoItem: {
+    flexDirection: 'row',
+    paddingBottom: 1,
+    height: 30,
+    marginTop: 1,
+    paddingLeft: 3,
+    borderBottomColor: 'gray',
+    borderBottomWidth: 1,
+  },
+  imageIconInfoMesaItem1: {
+    width: 20,
+    height: 20,
+  },
+  imageIconInfoMesaItem2: {
+    width: 21,
+    height: 25,
+  },
+  imageIconInfoMesaItem3: {
+    width: 20,
+    height: 20,
+    marginTop: 3,
+  },
+  imageIconInfoMesaItem4: {
+    width: 20,
+    height: 20,
+    marginTop: 3,
+  },
+  imageIconInfoMesaItem5: {
+    width: 17,
+    height: 20,
+    marginTop: 3,
+  },
+  imageIconInfoMesaItem6: {
+    width: 20,
+    height: 24,
+    marginTop: 3,
+  },
+  imageiconiteminfomesawrapper: {
+    width: 24,
+  },
+  textItemMesaInfo: {
+    color: '#2A64D0',
+  },
+  parcelasView: {
+    borderWidth: 1,
+    paddingBottom: 10,
+    marginTop: 10,
+    borderRadius: 10,
+    backgroundColor: '#e9e4cbff',
+  },
+  parcelasTitle: {
+    alignSelf: 'center',
+    fontWeight: 'bold',
+    marginVertical: 4,
+  },
+  parcelaItemView: {
+    flexDirection: 'row',
+    paddingLeft: 10,
+    borderTopWidth: 1,
+    borderStyle: 'dashed',
+    paddingVertical: 4,
+  },
+  parcelaItemText: {
+    width: '33%',
+  },
+  parcelasTitles: {
+    flexDirection: 'row',
+    marginLeft: 10,
+  },
+  parcelasTitlesText: {
+    width: '33%',
+  },
+  totalItenspagamentoView: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+  },
+  textTotalpagamentos: {
+    fontWeight: 'bold',
+    alignSelf: 'flex-end',
+    width: '33%',
+  },
+  texttotalizadorespagamento: {
+    textAlign: 'right',
+    paddingRight: 10,
+    fontWeight: 'bold',
+  },
+});
+
+export default Mesa;
+---------- "src\Mesas\ProdutosInserirMesa.tsx" ---------- 
+import { FlatList, StyleSheet, View } from 'react-native';
+import Cabecalho from '../components/Cabecalho';
+import { useCallback, useEffect, useState } from 'react';
+import ProdutoCard from '../components/CardProdutoInserirMesa';
+import Carrinho from '../components/Carrinho';
+import { useUser } from '../Context/userContext';
+import { useEmpresa } from '../Context/empresaContext';
+import { ProdutoPesquisaMultiEstoque } from '../API/api_rotas';
+import Rotas from '../Rotas/Rotas';
+import { reset } from '../Rotas/NavigatorContainerRef';
+import { useCarrinho } from '../Context/carrinhoContext';
+// import React, { useCallback, useMemo } from 'react';
+
+const ProdutosInserirMesa = ({ route }: any) => {
+
+  console.log('renderizando tela ProdutosInserirMesa')
+  const [produtos, setprodutos] = useState([] as any[]);
+  const { setCarrinho } = useCarrinho();
+  const [carrinhoAberto, setCarrinhoAberto] = useState(false);
+
+  const { user } = useUser();
+  const { empresa } = useEmpresa();
+
+  const handleInsert = useCallback((
+    produto: any,
+    quantidadeAdicionar: number,
+  ) => {
+    setCarrinho(prevCarrinho => {
+      const produtoExistente = prevCarrinho.find(
+        item => item.idproduto === produto.idproduto,
+      );
+
+      if (produtoExistente) {
+        // Se já existe, atualiza a quantidade e o idEstoque
+        setCarrinhoAberto(true)
+        return prevCarrinho.map(item =>
+          item.idproduto === produto.idproduto
+            ? {
+                ...item,
+                quantidade: item.quantidade + quantidadeAdicionar,
+
+              }
+            : item,
+        );
+      } else {
+        // Se não existe, adiciona novo produto
+        // console.log(carrinho);
+        setCarrinhoAberto(true)
+        return [
+          ...prevCarrinho,
+          {
+            ...produto,
+            quantidade: quantidadeAdicionar,
+          },
+        ];
+      }
+    });
+  },[setCarrinho]);
+
+  useEffect(() => {
+    async function getParams() {
+      const servername = user.servername;
+      const serverport = user.serverport;
+      const pathbanco = user.pathbanco;
+      const idempresa = empresa?.idparametro;
+      const tabelaprecosprodutopadrao = empresa?.tabelaprecosprodutopadrao;
+
+      if (servername && serverport && pathbanco) {
+        const resultado = await ProdutoPesquisaMultiEstoque({
+          servername,
+          serverport,
+          pathbanco,
+          tipopesquisa: '5',
+          valorpesquisa: route.params?.idgrupoproduto,
+          comandas: '1',
+          valido: 'S',
+          multiestoque: true,
+          idempresa,
+          tabelaprecosprodutopadrao,
+        });
+
+        // Alert.alert('retorno: ', JSON.stringify(resultado.data));
+        setprodutos(resultado.data);
+      } else {
+        setprodutos([]);
+      }
+    }
+
+    getParams();
+  }, []);
+
+  // const renderitem = ({ item }: any) => {
+  //   return <ProdutoCard handleInsert={handleInsert} produto={item} />;
+  // };
+
+  const renderitem = useCallback(
+    ({ item }: any) => (
+      <ProdutoCard handleInsert={handleInsert} produto={item} />
+    ),
+    [handleInsert],
+  );
+
+  const keyExtractor = useCallback(
+    (item: any) => `${item.codigobarras}` + `-${item.idestoque}`,
+    []
+  );
+  return (
+    <View style={s.MainView}>
+      {/* <Text>{JSON.stringify(route?.params)}</Text> */}
+
+      <Cabecalho
+        voltarFunction={() => {
+          reset(Rotas.GrupoProduto, {
+            statusmesa: route.params?.statusmesa,
+            nummesa: route.params?.nummesa,
+            idmovimento: route.params?.idmovimento,
+            idgrupoprodutomestre: route.params?.idgrupoprodutomestre,
+          });
+        }}
+      />
+
+      {/*
+      <Text>{empresa?.idestoquepadraopedido}</Text> */}
+
+      <View style={s.Body}>
+        <FlatList
+          data={produtos}
+          renderItem={renderitem}
+          keyExtractor={keyExtractor}
+          numColumns={2}
+          
+        />
+      </View>
+
+      <Carrinho
+        statusmesa={route.params?.statusmesa}
+        nummesa={route.params?.nummesa}
+        idmovimento={route.params?.idmovimento}
+        carrinhoAberto={carrinhoAberto}
+        setCarrinhoAberto={setCarrinhoAberto}
+      />
+    </View>
+  );
+};
+
+const s = StyleSheet.create({
+  MainView: {
+    flex: 1,
+  },
+  Body: {
+    flex: 1,
+    marginHorizontal: 5,
+    marginTop: 5,
+  },
+  viewItemCarrinho: { width: '100%', justifyContent: 'center' },
+});
+
+export default ProdutosInserirMesa;
+---------- "src\PaginaInicial\PaginaInicial.tsx" ---------- 
+import {
+  Image,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+import { ButtonCustom } from '../components/Button';
+import colors from '../ThemeContext/colors';
+import Rotas from '../Rotas/Rotas';
+import { useDebug } from '../Context/debugContext';
+// import { useNavigation } from '@react-navigation/native';
+import { useEffect } from 'react';
+import { useUser } from '../Context/userContext';
+import { useEmpresa } from '../Context/empresaContext';
+import { reset } from '../Rotas/NavigatorContainerRef';
+import { persistirContextos } from '../Context/persistirContextos';
+
+const PaginaInicial = ({ navigation }: any) => {
+  const { debug } = useDebug();
+
+  const { user } = useUser();
+
+  const { empresa } = useEmpresa();
+
+  useEffect(() => {
+    persistirContextos(user, empresa)
+  }, [user, empresa]);
+
+  return (
+    <View style={s.MainView}>
+      {debug && (
+        <>
+          {/* <Text>{
+        JSON.stringify(empresa)}</Text> */}
+          <Text style={s.pgsTxt}>
+            pgs: {String(navigation.getState().routes.length)}
+          </Text>
+        </>
+      )}
+      {debug && (
+        <View
+          style={{
+            maxHeight: '20%',
+            width: '100%',
+            flexDirection: 'row',
+            marginVertical: 10,
+          }}
+        >
+          {/* Empresa Context */}
+          <ScrollView style={{ flex: 1, marginRight: 5 }}>
+            <View style={{ backgroundColor: 'white', padding: 10 }}>
+              <Text style={{ fontWeight: 'bold', marginBottom: 5 }}>
+                EmpresaContext:
+              </Text>
+              {Object.entries(empresa || {}).map(([key, value]) => (
+                <Text key={key} style={{ marginBottom: 2 }}>
+                  {key}: {String(value)}
+                </Text>
+              ))}
+            </View>
+          </ScrollView>
+
+          {/* User Context */}
+          <ScrollView style={{ flex: 1, marginLeft: 5 }}>
+            <View style={{ backgroundColor: 'white', padding: 10 }}>
+              <Text style={{ fontWeight: 'bold', marginBottom: 5 }}>
+                UserContext:
+              </Text>
+              {Object.entries(user).map(([key, value]) => (
+                <Text key={key} style={{ marginBottom: 2 }}>
+                  {key}: {String(value)}
+                </Text>
+              ))}
+            </View>
+          </ScrollView>
+        </View>
+      )}
+
+      <View style={s.mainContainer}>
+        <View style={s.logoView}>
+          <Image
+            style={s.logoImage}
+            source={require('../assets/Images/VersaPOSlogo.png')}
+            resizeMode="contain"
+          />
+        </View>
+        <TouchableOpacity
+          onPress={() => {
+            reset(Rotas.MapaMesas, { origem: 'pagina inicial' });
+          }}
+        >
+          <Image
+            style={s.mesas_menu}
+            source={require('../assets/Images/mesas_menu.png')}
+            resizeMode="contain"
+          />
+        </TouchableOpacity>
+        {/* <Image
+          style={s.mesas_menu}
+          source={require('../assets/Images/comandas_menu.png')}
+          resizeMode="contain"
+        /> */}
+
+        <ButtonCustom
+          title="Sair"
+          style={s.ButtonSair}
+          onPress={() => {
+            reset(Rotas.Login);
+          }}
+        />
+      </View>
+    </View>
+  );
+};
+
+const s = StyleSheet.create({
+  MainView: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  mainContainer: {
+    width: 300,
+    paddingBottom: 10,
+    backgroundColor: 'white',
+    borderRadius: 12,
+  },
+  logoImage: {
+    width: 200,
+    height: 60,
+  },
+  mesas_menu: {
+    width: 230,
+    height: 230,
+    alignSelf: 'center',
+  },
+  logoView: {
+    width: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 10,
+  },
+  ButtonSair: {
+    backgroundColor: 'transparent',
+    color: colors.AzulClaro,
+    borderWidth: 2,
+    borderColor: colors.AzulClaro,
+  },
+  pgsTxt: {
+    color: '#ff0000ff',
+  },
+});
+
+export default PaginaInicial;
+---------- "src\Rotas\MainNavigator.tsx" ---------- 
+// src/Rotas/MainNavigator.tsx
+import React from 'react';
+import {NavigationContainer} from '@react-navigation/native';
+import { navigationRef } from './NavigatorContainerRef';
+import {createStackNavigator} from '@react-navigation/stack';
+import Rotas from './Rotas';
+// import {Text, View} from 'react-native';
+// import {TouchableOpacity} from 'react-native-gesture-handler';
+
+// Importa suas telas
+import { Login } from '../Login/login';
+
+import PaginaInicial from '../PaginaInicial/PaginaInicial';
+import MapaMesas from '../Mesas/MapaMesas';
+import Mesa from '../Mesas/Mesa';
+import GruposMestre from '../Mesas/GrupoMestre';
+import GruposProduto from '../Mesas/GrupoProduto';
+import ProdutosInserirMesa from '../Mesas/ProdutosInserirMesa';
+
+// function Login({navigation}: any) {
+//   return (
+//     <View>
+//       <Text>Tela de login!</Text>
+//       <TouchableOpacity
+//         style={{
+//           padding: 5,
+//           borderWidth: 1,
+//           borderColor: 'black',
+//           maxWidth: '50%',
+//           borderRadius: 10,
+//           alignSelf: 'center',
+//         }}
+//         onPress={() => {
+//           navigation.navigate(Rotas.PaginaInicial);
+//         }}>
+//         <Text>Navegar para página inicial!</Text>
+//       </TouchableOpacity>
+//     </View>
+//   );
+// }
+
+// function PaginaInicial() {
+//   return (
+//     <View>
+//       <Text>Página inicial!</Text>
+//     </View>
+//   );
+// }
+
+const Stack = createStackNavigator();
+
+export default function MainNavigator() {
+  return (
+    <NavigationContainer ref={navigationRef}>
+      <Stack.Navigator
+        initialRouteName={Rotas.Login}
+        screenOptions={{
+          headerShown: false,
+        }}>
+        <Stack.Screen name={Rotas.Login} component={Login} />
+        <Stack.Screen name={Rotas.PaginaInicial} component={PaginaInicial} />
+        <Stack.Screen name={Rotas.MapaMesas} component={MapaMesas} />
+        <Stack.Screen name={Rotas.Mesa} component={Mesa} />
+        <Stack.Screen name={Rotas.GrupoMestre} component={GruposMestre} />
+        <Stack.Screen name={Rotas.GrupoProduto} component={GruposProduto} />
+        <Stack.Screen name={Rotas.ProdutosInserirMesa} component={ProdutosInserirMesa} />
+      </Stack.Navigator>
+    </NavigationContainer>
+  );
+}
+---------- "src\Rotas\NavigatorContainerRef.tsx" ---------- 
+// NavigatorContainerRef.tsx
+import { CommonActions, NavigationContainerRef } from '@react-navigation/native';
+import * as React from 'react';
+
+// Cria referência manual
+export const navigationRef = React.createRef<NavigationContainerRef>();
+
+export function reset(name: string, params?: any) {
+  if (navigationRef.current) {
+    navigationRef.current.dispatch(
+      CommonActions.reset({
+        index: 0,
+        routes: [{ name, params }],
+      })
+    );
+  }
+}
+---------- "src\Rotas\Rotas.tsx" ---------- 
+const Rotas = {
+    Login: 'Login',
+    PaginaInicial: 'PaginaInicial',
+    MapaMesas: "MapaMesas",
+    Mesa: "Mesa",
+    GrupoMestre: "GrupoMestre",
+    GrupoProduto: "GrupoProduto",
+    ProdutosInserirMesa: "ProdutosInserirMesa"
+}
+
+export default Rotas;---------- "src\ThemeContext\colors.tsx" ---------- 
+
+
+
+const colors = {
+    AzulClaro: "#3562BC",
+    AzulEscuro: "#13254C",
+    CinzaClaro: "#ddddddff",
+    AzulMaisClaro: "#5b89e6ff",
+}
+
+export default colors;
