@@ -10,6 +10,7 @@ import {
   ScrollView,
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
+import CardReceberPagamento from './CardReceberPagamento';
 
 const returnScheme = 'reactnativeversapos'; // igual ao AndroidManifest
 
@@ -215,9 +216,13 @@ const CardPagamentoParcial = ({itens, idmovimento, nummesa}: any) => {
 
       {/* BOTÃO PAGAR PARCIAL */}
       <TouchableOpacity style={s.btn} onPress={enviarPagamentoParcial}>
-        <LinearGradient colors={['#99B0DC', '#2A64D0']} style={s.btnGrad}>
-          <Text style={s.btnTxt}>Pagar valor selecionado</Text>
-        </LinearGradient>
+        
+          <CardReceberPagamento
+              total={Number(totalPagar)}
+              idmovimento={idmovimento}
+              nummesa={nummesa}
+            />
+
       </TouchableOpacity>
     </View>
   );

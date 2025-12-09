@@ -92,7 +92,7 @@ export default function ProdutosInserirMesaLupa({route, navigation}: any) {
     ({item: produto}: any) => (
       <CardProdutoInserirItem
         selected={
-          ProdutoSelecionado.idproduto === produto.idproduto &&
+          ProdutoSelecionado.codigobarras === produto.codigobarras &&
           ProdutoSelecionado.idestoque === produto.idestoque
         }
         produto={produto}
@@ -101,7 +101,11 @@ export default function ProdutosInserirMesaLupa({route, navigation}: any) {
         showprodinfo={showprodinfo}
       />
     ),
-    [ProdutoSelecionado.idproduto, SetProdutoselecionadoo],
+    [
+      ProdutoSelecionado.codigobarras,
+      SetProdutoselecionadoo,
+      ProdutoSelecionado.idestoque,
+    ],
   );
 
   const InserirProdutoMovimento = useCallback(async () => {
@@ -120,7 +124,6 @@ export default function ProdutosInserirMesaLupa({route, navigation}: any) {
       if (!isNaN(numero)) {
         if (Number.isInteger(numero)) {
         } else {
-
         }
       } else {
         Alert.alert('Digite uma quantidade válida');
@@ -276,8 +279,6 @@ export default function ProdutosInserirMesaLupa({route, navigation}: any) {
   const {debug} = useDebug();
   return (
     <View style={{flex: 1, padding: 4}}>
-      {/* <Text>{JSON.stringify(ProdutoSelecionado)}</Text> */}
-
       <Cabecalho
         showdebug={debug ? 'idmov: ' + idmovimento : ''}
         voltarFunction={() => {

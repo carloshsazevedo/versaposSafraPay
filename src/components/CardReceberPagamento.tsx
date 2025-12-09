@@ -165,7 +165,7 @@ const CardReceberPagamento: React.FC<Props> = ({
 
     const idformapagtodfe = mapFormaPagamentoToId(method);
 
-    await CadastroMovimentoPagamento({
+    const res = await CadastroMovimentoPagamento({
       idusuario: user.usuario,
       servername: user.servername,
       serverport: user.serverport,
@@ -178,6 +178,8 @@ const CardReceberPagamento: React.FC<Props> = ({
       idformapagtodfe,
       resultado_safra: result.raw,
     });
+
+    console.log("Retorno do cadastro movimentopagamento: ", JSON.stringify(res))
 
     const dataenviar = new Date();
 
