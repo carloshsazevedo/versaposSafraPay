@@ -4,9 +4,12 @@ import { useCarrinho } from '../Context/carrinhoContext';
 import { useUser } from '../Context/userContext';
 import { useEmpresa } from '../Context/empresaContext';
 import { ProdutoImagemProduto } from '../API/api_rotas';
+import ModalObservacao from './CardModalObservacoesProdutoCarrinho';
 
 const ProdutoCardCarrinho = React.memo(({ produto }: { produto: any }) => {
-  const { setCarrinho } = useCarrinho();
+  const { setCarrinho, alterarObservacao } = useCarrinho();
+
+  const [modalVisible, setModalVisible] = useState(false);
 
   async function handleAdd() {
     setCarrinho(prev => {
@@ -19,6 +22,7 @@ const ProdutoCardCarrinho = React.memo(({ produto }: { produto: any }) => {
           : item,
       );
     });
+    
   }
 
   async function handleRemove() {
@@ -89,7 +93,7 @@ const ProdutoCardCarrinho = React.memo(({ produto }: { produto: any }) => {
       <View style={styles.view2}>
         <Text style={styles.textdescricao}>{produto.descricao}</Text>
 
-        <TouchableOpacity onPress={() => {}}>
+        <TouchableOpacity onPress={() => setModalVisible(true)}>
           <View style={styles.view3}>
             <View style={styles.view4}>
               <Text style={styles.textobservacao}>
@@ -143,6 +147,15 @@ const ProdutoCardCarrinho = React.memo(({ produto }: { produto: any }) => {
           <Button onPress={handleAdd}>+</Button> */}
         </View>
       </View>
+
+      <ModalObservacao
+        visible={modalVisible}
+        onClose={() => setModalVisible(false)}
+        initialValue={produto.observacoes}
+        onSave={(texto: string) => {
+          alterarObservacao(produto.idproduto, texto);
+        }}
+      />
     </View>
   );
 });

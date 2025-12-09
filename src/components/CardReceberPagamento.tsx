@@ -327,7 +327,7 @@ const CardReceberPagamento: React.FC<Props> = ({
         disabled={loading}>
         <LinearGradient style={s.mainLinear} colors={['#99B0DC', '#2A64D0']}>
           <Text style={s.mainText}>
-            {loading ? 'Processando...' : 'Receber pagamento (SafraPay)'}
+            {loading ? 'Processando...' : 'Pagamento total'}
           </Text>
           <Text style={s.valueText}>
             Total a receber:{' '}
@@ -359,7 +359,7 @@ const CardReceberPagamento: React.FC<Props> = ({
 
               <Text style={s.label}>Informe o valor do pagamento</Text>
               <Text style={s.helperText}>
-                Por padrão, usamos o valor total da conta. Você pode reduzir
+                Você pode reduzir
                 para receber um valor parcial.
               </Text>
 
@@ -599,4 +599,4 @@ const s = StyleSheet.create({
   },
 });
 
-export default CardReceberPagamento;
+export default React.memo(CardReceberPagamento);

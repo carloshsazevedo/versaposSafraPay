@@ -360,6 +360,7 @@ export default function ProdutosInserirMesaLupa({route, navigation}: any) {
         }}>
         {filtropesquisa == 'Código de Barras' && (
           <TextInput
+          placeholder='Digite o código do produto...'
             style={{
               borderWidth: 1,
               borderColor: '#c0c0c0ff',
@@ -375,6 +376,7 @@ export default function ProdutosInserirMesaLupa({route, navigation}: any) {
 
         {filtropesquisa != 'Código de Barras' && (
           <TextInput
+          placeholder='Digite a descrição do produto...'
             style={{
               borderWidth: 1,
               borderColor: '#c0c0c0ff',

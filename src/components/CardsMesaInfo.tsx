@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, Image, StyleSheet } from 'react-native';
 import EyeAnimation from './EyeAnimation';
 
-const Cliente: React.FC<{ nome?: string }> = ({ nome }) => (
+const Cliente = React.memo(({ nome }: { nome?: string }) => (
   <View style={s.ViewMesaInfoItem}>
     <View style={s.imageiconiteminfomesawrapper}>
       <Image
@@ -14,9 +14,9 @@ const Cliente: React.FC<{ nome?: string }> = ({ nome }) => (
     <Text style={s.textItemMesaInfo}> Cliente: </Text>
     <Text style={s.textValorItemMesaInfo}> {nome} </Text>
   </View>
-);
+));
 
-const Garcom: React.FC<{ nome?: string }> = ({ nome }) => (
+const Garcom = React.memo(({ nome }: { nome?: string }) => (
   <View style={s.ViewMesaInfoItem}>
     <View style={s.imageiconiteminfomesawrapper}>
       <Image
@@ -25,12 +25,12 @@ const Garcom: React.FC<{ nome?: string }> = ({ nome }) => (
         source={require('../assets/Images/icon_garcom.png')}
       />
     </View>
-    <Text style={[s.textItemMesaInfo]}> Garçom: </Text>
+    <Text style={s.textItemMesaInfo}> Garçom: </Text>
     <Text style={s.textValorItemMesaInfo}> {nome} </Text>
   </View>
-);
+));
 
-const Abertura: React.FC<{ abertura?: string }> = ({ abertura }) => (
+const Abertura = React.memo(({ abertura }: { abertura?: string }) => (
   <View style={s.ViewMesaInfoItem}>
     <View style={s.imageiconiteminfomesawrapper}>
       <Image
@@ -39,12 +39,12 @@ const Abertura: React.FC<{ abertura?: string }> = ({ abertura }) => (
         source={require('../assets/Images/icon_abertura.png')}
       />
     </View>
-    <Text style={[s.textItemMesaInfo]}> Abertura: </Text>
+    <Text style={s.textItemMesaInfo}> Abertura: </Text>
     <Text style={s.textValorItemMesaInfo}> {abertura} </Text>
   </View>
-);
+));
 
-const Utilizacao: React.FC<{ utilizacao?: string }> = ({ utilizacao }) => (
+const Utilizacao = React.memo(({ utilizacao }: { utilizacao?: string }) => (
   <View style={s.ViewMesaInfoItem}>
     <View style={s.imageiconiteminfomesawrapper}>
       <Image
@@ -53,12 +53,12 @@ const Utilizacao: React.FC<{ utilizacao?: string }> = ({ utilizacao }) => (
         source={require('../assets/Images/icon_utilizacao.png')}
       />
     </View>
-    <Text style={[s.textItemMesaInfo]}> Utilização: </Text>
+    <Text style={s.textItemMesaInfo}> Utilização: </Text>
     <Text style={s.textValorItemMesaInfo}> {utilizacao} </Text>
   </View>
-);
+));
 
-const Taxa: React.FC<{ taxa?: number }> = ({ taxa }) => {
+const Taxa = React.memo(({ taxa }: { taxa?: number }) => {
   const [taxaVisivel, settaxaVisivel] = useState(false);
 
   return (
@@ -70,12 +70,11 @@ const Taxa: React.FC<{ taxa?: number }> = ({ taxa }) => {
           source={require('../assets/Images/icon_taxa.png')}
         />
       </View>
-      <Text style={[s.textItemMesaInfo]}> Taxa: </Text>
+      <Text style={s.textItemMesaInfo}> Taxa: </Text>
 
       {taxaVisivel && (
         <Text style={s.textValorItemMesaInfo}>
-          R$ {taxa && String(taxa?.toFixed(2)).replace('.', ',')}
-          {!taxa && '0,00'}{' '}
+          R$ {taxa ? taxa.toFixed(2).replace('.', ',') : '0,00'}
         </Text>
       )}
       <View style={s.EyeAnimationTaxa}>
@@ -86,42 +85,41 @@ const Taxa: React.FC<{ taxa?: number }> = ({ taxa }) => {
       </View>
     </View>
   );
-};
-const Consumacao: React.FC<{ consumacao?: number }> = ({ consumacao }) => (
-  <View style={s.ViewMesaInfoItem}>
-    <View style={s.imageiconiteminfomesawrapper}>
-      <Image
-        alt="icon_consumacao"
-        style={s.imageIconInfoMesaItem6}
-        source={require('../assets/Images/icon_consumacao.png')}
-      />
-    </View>
-    <Text style={s.textItemMesaInfo}> Consumação: </Text>
-    <Text style={s.textValorItemMesaInfo}>
-      R$ {consumacao && String(consumacao?.toFixed(2)).replace('.', ',')}
-      {!consumacao && '0,00'}
-    </Text>
-  </View>
-);
+});
 
-const TotalMesa: React.FC<{ total?: number }> = ({ total }) => {
-  return (
-    <View style={s.ViewTotalMesa}>
-      <Image
-        alt="icon_totalmesa"
-        style={s.imageTotalMesa}
-        source={require('../assets/Images/icon_totalmesa.png')}
-      />
-      <Text style={s.textTotal}>Total:</Text>
-
-      <Text style={s.TotalMesaNumber}>
-        R$ {total && String(total?.toFixed(2)).replace('.', ',')}
+const Consumacao = React.memo(
+  ({ consumacao }: { consumacao?: number }) => (
+    <View style={s.ViewMesaInfoItem}>
+      <View style={s.imageiconiteminfomesawrapper}>
+        <Image
+          alt="icon_consumacao"
+          style={s.imageIconInfoMesaItem6}
+          source={require('../assets/Images/icon_consumacao.png')}
+        />
+      </View>
+      <Text style={s.textItemMesaInfo}> Consumação: </Text>
+      <Text style={s.textValorItemMesaInfo}>
+        R$ {consumacao ? consumacao.toFixed(2).replace('.', ',') : '0,00'}
       </Text>
     </View>
-  );
-};
+  )
+);
 
-// --- Objeto principal com subcomponentes ---
+const TotalMesa = React.memo(({ total }: { total?: number }) => (
+  <View style={s.ViewTotalMesa}>
+    <Image
+      alt="icon_totalmesa"
+      style={s.imageTotalMesa}
+      source={require('../assets/Images/icon_totalmesa.png')}
+    />
+    <Text style={s.textTotal}>Total:</Text>
+    <Text style={s.TotalMesaNumber}>
+      R$ {total ? total.toFixed(2).replace('.', ',') : '0,00'}
+    </Text>
+  </View>
+));
+
+// --- exporta o objeto principal memoizado ---
 export const CardMesaInfo = {
   Cliente,
   Garcom,
@@ -129,8 +127,9 @@ export const CardMesaInfo = {
   Abertura,
   Utilizacao,
   Consumacao,
-  TotalMesa
+  TotalMesa,
 };
+
 
 const s = StyleSheet.create({
   ViewMesaInfoItem: {

@@ -1,4 +1,5 @@
-import { StyleSheet, View, Text, Image } from 'react-native';
+import React from 'react';
+import {StyleSheet, View, Text, Image} from 'react-native';
 
 interface FornecedorType {
   nome: string;
@@ -6,11 +7,10 @@ interface FornecedorType {
   cnpj: string;
 }
 
-interface FornecedorCard{
-    fornecedor: FornecedorType
+interface FornecedorCard {
+  fornecedor: FornecedorType;
 }
-
-export default function CardParceiroSelecionado({ fornecedor  }: FornecedorCard) {
+function CardParceiroSelecionado({fornecedor}: FornecedorCard) {
   return (
     <View>
       <View style={s.MainView}>
@@ -21,7 +21,9 @@ export default function CardParceiroSelecionado({ fornecedor  }: FornecedorCard)
         />
 
         <View style={s.View2}>
-          <Text numberOfLines={2} style={s.FornNome}>{fornecedor.nome}</Text>
+          <Text numberOfLines={2} style={s.FornNome}>
+            {fornecedor.nome}
+          </Text>
           <Text style={s.FornTipo}>
             {fornecedor.tipofornecedor === 'J' ? 'CNPJ:' : 'CPF:'}{' '}
             {fornecedor.cnpj}
@@ -38,11 +40,11 @@ const s = StyleSheet.create({
     color: 'white',
     fontWeight: 'bold',
     fontSize: 10,
-    maxWidth: "70%",
-    textAlign: "center"
+    maxWidth: '70%',
+    textAlign: 'center',
   },
-  FornTipo: { marginRight: 1, color: 'white', fontWeight: 'bold', fontSize: 9 },
-  View2: { marginLeft: 1 },
+  FornTipo: {marginRight: 1, color: 'white', fontWeight: 'bold', fontSize: 9},
+  View2: {marginLeft: 1},
   MainView: {
     borderRadius: 6,
     width: 160,
@@ -53,5 +55,6 @@ const s = StyleSheet.create({
     flexDirection: 'row',
     paddingHorizontal: 3,
   },
-  image: { width: 35, height: 20, flexDirection: 'column', marginRight: 5 },
+  image: {width: 35, height: 20, flexDirection: 'column', marginRight: 5},
 });
+export default React.memo(CardParceiroSelecionado);

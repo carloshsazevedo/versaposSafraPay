@@ -1,6 +1,7 @@
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import CardImprimirConta from './CardImprimirConta';
+import React from 'react';
 
 interface CardTransfimpProps {
   idmovimento?: string;
@@ -68,4 +69,6 @@ const s = StyleSheet.create({
   },
 });
 
-export default CardTrasnfetirImprimir;
+
+export default React.memo(CardTrasnfetirImprimir)
+

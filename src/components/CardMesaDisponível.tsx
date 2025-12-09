@@ -1,5 +1,6 @@
 // import {  faUtensils } from "@fortawesome/free-solid-svg-icons"
 // import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome"
+import React from "react"
 import { Text, View } from "react-native"
 
 const CardMesaDisponivel = ({nummesa} : any) => {
@@ -48,6 +49,6 @@ const CardMesaDisponivel = ({nummesa} : any) => {
           </View>
     )
 }
+export default React.memo(CardMesaDisponivel)
 
 
-export default CardMesaDisponivel;

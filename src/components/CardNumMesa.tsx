@@ -1,3 +1,4 @@
+import React from 'react';
 import {  Image, StyleSheet, Text, View } from 'react-native';
 
 
@@ -9,7 +10,7 @@ interface InputProps {
 
 }
 
-export default function CardNumMesa({ mesa }: InputProps) {
+function CardNumMesa({ mesa }: InputProps) {
 
     const cor_ocupada = ['#EE8795', '#D13E52']
     const cor_reservada = ['#FDCD9E', '#FFA54D']
@@ -75,3 +76,6 @@ const s = StyleSheet.create({
 
     }
 })
+
+
+export default React.memo(CardNumMesa)

@@ -21,7 +21,7 @@ const CardPagamentoParcial = ({itens, idmovimento, nummesa}: any) => {
     const ini: any = {};
     itens.forEach((item: any) => {
       const prec =
-        (item.precooriginal ?? item.totalitem) + (item.valoracrescimo ?? 0);
+        (item.preco)
 
       ini[item.iditemmovimento] = {
         selecionado: false,
@@ -343,4 +343,4 @@ const s = StyleSheet.create({
   },
 });
 
-export default CardPagamentoParcial;
+export default React.memo(CardPagamentoParcial);

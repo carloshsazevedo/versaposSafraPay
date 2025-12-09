@@ -1,6 +1,7 @@
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import CardItemMovimento from './CardItemMovimento';
+import React from 'react';
 
 
 interface CardItensMovimentoProps{
@@ -114,4 +115,4 @@ const s = StyleSheet.create({
   }
 });
 
-export default CardItensMovimento;
+export default React.memo(CardItensMovimento);
