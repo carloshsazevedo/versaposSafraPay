@@ -5,7 +5,8 @@ const Rotas = {
     Mesa: "Mesa",
     GrupoMestre: "GrupoMestre",
     GrupoProduto: "GrupoProduto",
-    ProdutosInserirMesa: "ProdutosInserirMesa"
+    ProdutosInserirMesa: "ProdutosInserirMesa",
+    ProdutosInserirMesaLupa: "ProdutosInserirMesaLupa",
 }
 
 export default Rotas;

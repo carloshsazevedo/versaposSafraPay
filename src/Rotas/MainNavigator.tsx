@@ -16,6 +16,7 @@ import Mesa from '../Mesas/Mesa';
 import GruposMestre from '../Mesas/GrupoMestre';
 import GruposProduto from '../Mesas/GrupoProduto';
 import ProdutosInserirMesa from '../Mesas/ProdutosInserirMesa';
+import ProdutosInserirMesaLupa from '../Mesas/ProdutosInserirMesaLupa';
 
 // function Login({navigation}: any) {
 //   return (
@@ -64,6 +65,7 @@ export default function MainNavigator() {
         <Stack.Screen name={Rotas.GrupoMestre} component={GruposMestre} />
         <Stack.Screen name={Rotas.GrupoProduto} component={GruposProduto} />
         <Stack.Screen name={Rotas.ProdutosInserirMesa} component={ProdutosInserirMesa} />
+        <Stack.Screen name={Rotas.ProdutosInserirMesaLupa} component={ProdutosInserirMesaLupa} />
       </Stack.Navigator>
     </NavigationContainer>
   );

@@ -64,9 +64,9 @@ const CardImprimirConta = ({ info }: any) => {
         const totalItem = formatarValor(item.totalitem ?? 0);
 
         // Linha principal (limita nome pra não estourar)
-        const nomeCorte = nome.substring(0, 20);
+        const nomeCorte = nome.substring(0, 15);
         const linhaPrincipal = `${nomeCorte} ${qtd} x ${precoUnit} = R$ ${totalItem}`;
-        pushText(linhaPrincipal, 'left', 'small');
+        pushText(linhaPrincipal, 'left', 'medium');
 
         // Se quiser quebrar nome muito longo em 2 linhas, pode ativar isso:
         // if (nome.length > 20) {

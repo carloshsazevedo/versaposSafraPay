@@ -5,9 +5,10 @@ import CardVoltar from "./CardVoltar";
 interface CabecalhoType{
     showdebug?: string;
     voltarFunction: (value: any) => void;
+    nummesa?: string;
 }
 
-const Cabecalho = ({voltarFunction, showdebug}: CabecalhoType) =>{
+const Cabecalho = ({voltarFunction,nummesa, showdebug}: CabecalhoType) =>{
 
     return(
         <View style={s.Header}>
@@ -26,6 +27,22 @@ const Cabecalho = ({voltarFunction, showdebug}: CabecalhoType) =>{
         />
         {showdebug && <Text style={s.showdebug}>{showdebug}</Text>}
         </View>
+
+        {nummesa && (
+        <Text
+          style={{
+            position: 'absolute',
+            backgroundColor: '#2A64D0',
+            borderRadius: 10,
+            padding: 4,
+            fontWeight: 'bold',
+            color: 'white',
+            right: 0,
+            alignSelf: 'center',
+          }}>
+          {nummesa}
+        </Text>
+      )}
       </View>
     )
 }

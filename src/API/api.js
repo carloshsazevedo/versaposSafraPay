@@ -21,6 +21,7 @@ export async function getApi() {
     api.interceptors.response.use(
       (response) => {
     //### 🔹 Tratar erro mesmo com status 200
+    
     if (response?.data?.erro) {
       if (response.data.erro !== 'Parcela(s) não encontrado(s).'){
       Alert.alert("Resultado:", response.data.erro);}

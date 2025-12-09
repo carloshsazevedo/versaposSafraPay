@@ -1,6 +1,7 @@
 import {
   ActivityIndicator,
   Alert,
+  Modal,
   ScrollView,
   StyleSheet,
   Text,
@@ -11,27 +12,29 @@ import Cabecalho from '../components/Cabecalho';
 import CardNumMesa from '../components/CardNumMesa';
 import CardParceiro from '../components/CardParceiro';
 import CardParceiroSelecionado from '../components/CardParceiroSelecionado';
-import { useCallback, useEffect, useState } from 'react';
-import { CardMesaInfo } from '../components/CardsMesaInfo';
+import {useCallback, useEffect, useState} from 'react';
+import {CardMesaInfo} from '../components/CardsMesaInfo';
 import CardMesaDisponivel from '../components/CardMesaDisponível';
 import CardItensMovimento from '../components/CardItensMovimento';
 import CardTrasnfetirImprimir from '../components/CardTrasnfetirImprimir';
 import Rotas from '../Rotas/Rotas';
-import { useUser } from '../Context/userContext';
+import {useUser} from '../Context/userContext';
 import {
   ConsultaFornecedor,
   ItemmovimentoPesquisaitemmovimentocomandas,
   ConsultaMovimentoPagamento,
   RemoveItemMovimento,
 } from '../API/api_rotas';
-import { useEmpresa } from '../Context/empresaContext';
+import {useEmpresa} from '../Context/empresaContext';
 import CardReceberPagamento from '../components/CardReceberPagamento';
-import { reset } from '../Rotas/NavigatorContainerRef';
-import { useCarrinho } from '../Context/carrinhoContext';
+import {reset} from '../Rotas/NavigatorContainerRef';
+import {useCarrinho} from '../Context/carrinhoContext';
 import ModalSelecionarFornecedor from '../components/ModalSelecionarFornecedor';
+import LinearGradient from 'react-native-linear-gradient';
+import CardReceberPagamentoParcial from '../components/CardReceberPagamentoParcial';
 
-const Mesa = ({ route }: any) => {
-  const { setCarrinho } = useCarrinho();
+const Mesa = ({route}: any) => {
+  const {setCarrinho} = useCarrinho();
   const [nomeFornecedor, setnomeFornecedor] = useState('');
   const [tipoFornecedor, settipoFornecedor] = useState('');
   const [cnpjFornecedor, setcnpjFornecedor] = useState('');
@@ -43,8 +46,10 @@ const Mesa = ({ route }: any) => {
   const [Taxa, setTaxa] = useState(0.0);
   const [Consumacao, setConsumacao] = useState(0.0);
   const [totalMesa, settotalMesa] = useState(0.0);
-  const { user } = useUser();
-  const { empresa } = useEmpresa();
+  const {user} = useUser();
+  const {empresa} = useEmpresa();
+
+  const [pagamentoparcial, setpagamentoparcial] = useState(false);
 
   const [itensmovimento, setitensmovimento] = useState([] as any[]);
 
@@ -95,7 +100,13 @@ const Mesa = ({ route }: any) => {
       const idempresa = empresa?.idparametro;
       const tipomovimento = empresa?.tipomovimentomesascomandas;
 
-      if (!servername || !serverport || !pathbanco || !idempresa || !idmovimento) {
+      if (
+        !servername ||
+        !serverport ||
+        !pathbanco ||
+        !idempresa ||
+        !idmovimento
+      ) {
         return;
       }
 
@@ -259,8 +270,7 @@ const Mesa = ({ route }: any) => {
                   return;
                 }
                 setvisibleModalFornecedor(true);
-              }}
-            >
+              }}>
               <CardParceiro />
             </TouchableOpacity>
           )}
@@ -285,15 +295,26 @@ const Mesa = ({ route }: any) => {
               nummesa={route.params?.nummesa}
             />
 
+            <TouchableOpacity
+              onPress={() => {
+                setpagamentoparcial(true);
+              }}>
+              <LinearGradient
+                style={s.mainLinear}
+                colors={['#2A64D0', '#99B0DC']}>
+                <Text style={s.mainText}>Pagamento Parcial</Text>
+              </LinearGradient>
+            </TouchableOpacity>
+
             {/* Pagamentos: card com activity indicator quando carregando */}
             {empresa?.geraparcelaversapospagamento === 'S' && (
               <>
                 {loadingPagamentos ? (
                   <View style={s.parcelasView}>
                     <Text style={s.parcelasTitle}>Pagamentos</Text>
-                    <View style={{ paddingVertical: 10, alignItems: 'center' }}>
+                    <View style={{paddingVertical: 10, alignItems: 'center'}}>
                       <ActivityIndicator size="small" color="#2A64D0" />
-                      <Text style={{ marginTop: 4, fontSize: 12 }}>
+                      <Text style={{marginTop: 4, fontSize: 12}}>
                         Carregando pagamentos...
                       </Text>
                     </View>
@@ -319,30 +340,25 @@ const Mesa = ({ route }: any) => {
                         </View>
                       ))}
                       <View
-                        style={[s.totalItenspagamentoView, { marginTop: 10 }]}
-                      >
+                        style={[s.totalItenspagamentoView, {marginTop: 10}]}>
                         <Text
                           style={[
                             s.parcelaItemText,
                             s.texttotalizadorespagamento,
-                          ]}
-                        >
+                          ]}>
                           Total pago:
                         </Text>
                         <Text style={s.textTotalpagamentos}>
-                          R${' '}
-                          {String(totalPago.toFixed(2)).replace('.', ',')}
+                          R$ {String(totalPago.toFixed(2)).replace('.', ',')}
                         </Text>
                       </View>
                       <View
-                        style={[s.totalItenspagamentoView, { marginTop: 10 }]}
-                      >
+                        style={[s.totalItenspagamentoView, {marginTop: 10}]}>
                         <Text
                           style={[
                             s.parcelaItemText,
                             s.texttotalizadorespagamento,
-                          ]}
-                        >
+                          ]}>
                           Total restante:
                         </Text>
                         <Text style={s.textTotalpagamentos}>
@@ -378,6 +394,13 @@ const Mesa = ({ route }: any) => {
         )}
 
         <CardItensMovimento
+          onPressLupa={() => {
+            reset(Rotas.ProdutosInserirMesaLupa, {
+              idmovimento,
+              nummesa: route?.params.nummesa,
+              statusmesa: route.params.statusmesa,
+            });
+          }}
           itensmovimento={itensmovimento}
           onPressAddItem={() => {
             setCarrinho([]);
@@ -411,6 +434,29 @@ const Mesa = ({ route }: any) => {
           </View>
         </View>
       )}
+
+
+      <Modal visible={pagamentoparcial} animationType="fade" transparent>
+  <View style={styles.overlay}>
+    <View style={styles.modalBox}>
+
+      {/* Botão fechar */}
+      <TouchableOpacity style={styles.btnFechar} onPress={() => setpagamentoparcial(false)}>
+        <Text style={styles.btnFecharText}>Cancelar</Text>
+      </TouchableOpacity>
+
+      
+        <CardReceberPagamentoParcial
+          itens={itensmovimento}
+          idmovimento={idmovimento}
+          nummesa={route.params.nummesa}
+      
+        />
+      
+
+    </View>
+  </View>
+</Modal>
     </View>
   );
 };
@@ -424,6 +470,14 @@ const s = StyleSheet.create({
     justifyContent: 'space-between',
     marginTop: 5,
   },
+  mainLinear: {
+    padding: 10,
+    alignItems: 'center',
+    borderRadius: 10,
+    marginTop: 10,
+  },
+  mainText: {color: 'white', fontWeight: 'bold'},
+
   MainScrollView: {
     flex: 1,
     marginHorizontal: 10,
@@ -542,6 +596,112 @@ const s = StyleSheet.create({
     marginTop: 8,
     fontSize: 14,
     color: '#333',
+  },
+});
+
+
+const styles = StyleSheet.create({
+  modalOverlay: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.5)',
+  },
+  modalContainer: {
+    width: '80%',
+    backgroundColor: '#fff',
+    padding: 20,
+    borderRadius: 12,
+    elevation: 10,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 15,
+    textAlign: 'center',
+  },
+  input: {
+    backgroundColor: '#f3f3f3',
+    borderRadius: 8,
+    padding: 10,
+    fontSize: 18,
+    textAlign: 'center',
+    marginBottom: 20,
+  },
+  row: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  btn: {
+    flex: 1,
+    padding: 12,
+    borderRadius: 10,
+    alignItems: 'center',
+    marginHorizontal: 5,
+  },
+  btnCancelar: {
+    backgroundColor: '#aaa',
+  },
+  btnSalvar: {
+    backgroundColor: '#28a745',
+  },
+  btnText: {
+    color: '#fff',
+    fontWeight: 'bold',
+  },
+  overlayLoading: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.45)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  boxLoading: {
+    backgroundColor: '#FFF',
+    paddingVertical: 25,
+    paddingHorizontal: 40,
+    borderRadius: 10,
+    elevation: 5,
+  },
+  loadingText: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#333',
+  },
+    overlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)', 
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+  },
+
+  modalBox: {
+    width: '100%',
+    maxHeight: '85%',
+    backgroundColor: '#fff',
+    borderRadius: 20,
+    padding: 20,
+    elevation: 10,
+    shadowColor: '#000',
+    shadowOpacity: 0.3,
+    shadowRadius: 10,
+    borderWidth: 1,
+    borderColor: '#ddd',
+  },
+
+  btnFechar: {
+    alignSelf: 'flex-end',
+    paddingVertical: 6,
+    paddingHorizontal: 14,
+    backgroundColor: '#d9534f',
+    borderRadius: 8,
+    marginBottom: 10,
+  },
+
+  btnFecharText: {
+    color: 'white',
+    fontWeight: 'bold',
+    fontSize: 14,
   },
 });
 

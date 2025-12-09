@@ -124,6 +124,25 @@ export async function RemoveItemMovimento(credentials: any) {
   return response;
 }
 
+export async function MesaTransferirItensMesa(credentials: any) {
+  const api = await getApi();
+  const response = await api.post('/mesas/transferiritensmesa', credentials);
+  return response;
+}
+
+export async function ConsultaObservacoes(credentials: any) {
+  const api = await getApi();
+  const response = await api.post('/consulta/observacoes', credentials);
+  return response;
+}
+
+export async function MovimentoInsereitemcomanda(credentials: any) {
+  const api = await getApi();
+  const response = await api.post('/movimento/insereitemcomanda', credentials);
+  return response;
+}
+
+
 
 
 
