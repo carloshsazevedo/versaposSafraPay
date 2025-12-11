@@ -27,6 +27,7 @@ import {reset} from '../Rotas/NavigatorContainerRef';
 import Rotas from '../Rotas/Rotas';
 import {useDebug} from '../Context/debugContext';
 import CardProdutoInserirItem from '../components/CardProdutoInserirItem';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function ProdutosInserirMesaLupa({route, navigation}: any) {
   const [showdropdownfiltropesquisa, setshowdropdownfiltropesquisa] =
@@ -53,7 +54,22 @@ export default function ProdutosInserirMesaLupa({route, navigation}: any) {
   const {user} = useUser();
   const {empresa} = useEmpresa();
 
+  const [ALTERAR_PRECO_PRODUTO, setALTERAR_PRECO_PRODUTO] = useState('')
+
   useEffect(() => {
+
+    async function getParams(){
+      const ALTERAR_PRECO_PRODUTO = await AsyncStorage.getItem('ALTERAR_PRECO_PRODUTO')
+
+    setALTERAR_PRECO_PRODUTO(ALTERAR_PRECO_PRODUTO || '')
+    }
+
+    getParams()
+    
+  }, [])
+
+
+    useEffect(() => {
     // Listener para quando o teclado aparece
     const keyboardDidShowListener = Keyboard.addListener(
       'keyboardDidShow',
@@ -566,6 +582,7 @@ export default function ProdutosInserirMesaLupa({route, navigation}: any) {
                 +
               </Text>
             </TouchableOpacity>
+            
             <TextInput
               style={{
                 borderWidth: 1,
@@ -576,6 +593,7 @@ export default function ProdutosInserirMesaLupa({route, navigation}: any) {
               }}
               placeholder="Preço"
               keyboardType="numeric"
+              editable={ALTERAR_PRECO_PRODUTO? true : false}
               onChangeText={setprecovendaitemselecionado}
               value={precovendaitemselecionado}
             />

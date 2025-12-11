@@ -656,6 +656,8 @@ public class SafraPayModule extends ReactContextBaseJavaModule {
                     } else if ("invert".equals(styleStr)) {
                         textStyle = PrinterTextStyle.NORMAL;
                         invert = true;
+                    } else if ("italic".equals(styleStr)) {
+                        textStyle = PrinterTextStyle.ITALIC;
                     }
 
                     printer.addStringLine(

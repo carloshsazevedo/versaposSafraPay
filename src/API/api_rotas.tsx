@@ -142,6 +142,12 @@ export async function MovimentoInsereitemcomanda(credentials: any) {
   return response;
 }
 
+export async function UsuarioPermissoes(credentials: any) {
+  const api = await getApi();
+  const response = await api.post('/usuario/permissoes', credentials);
+  return response;
+}
+
 
 
 

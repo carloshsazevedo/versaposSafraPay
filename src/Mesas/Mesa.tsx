@@ -33,6 +33,7 @@ import {useCarrinho} from '../Context/carrinhoContext';
 import ModalSelecionarFornecedor from '../components/ModalSelecionarFornecedor';
 import LinearGradient from 'react-native-linear-gradient';
 import CardReceberPagamentoParcial from '../components/CardReceberPagamentoParcial';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Mesa = ({route}: any) => {
   const {setCarrinho} = useCarrinho();
@@ -77,6 +78,8 @@ const Mesa = ({route}: any) => {
   const [loadingMesa, setLoadingMesa] = useState(false);
   const [loadingPagamentos, setLoadingPagamentos] = useState(false);
 
+  const [TRANSFERIR_ITENS_MESA, setTRANSFERIR_ITENS_MESA] = useState('')
+
   // formatar data "2025-09-26T13:45:00.000Z" em "26/09/2025 13:45"
   const formatarData = useCallback((dataString: any) => {
     const data = new Date(dataString);
@@ -111,7 +114,7 @@ const Mesa = ({route}: any) => {
 
   async function carregarPagamentos() {
     setLoadingPagamentos(true);
-    console.log("Carregando pagamentos!")
+    console.log('Carregando pagamentos!');
     try {
       if (empresa?.geraparcelaversapospagamento === 'S') {
         const servername = user.servername;
@@ -119,15 +122,15 @@ const Mesa = ({route}: any) => {
         const pathbanco = user.pathbanco;
         const idempresa = empresa?.idparametro;
 
-        const result = await ConsultaMovimentoPagamento({
+        const result = (await ConsultaMovimentoPagamento({
           serverport,
           servername,
           pathbanco,
           idmovimento,
           idempresa,
-        }) as any;
-        console.log("Res: ", result)
-       
+        })) as any;
+        console.log('Res: ', result);
+
         setpagamentos(result.data ?? []);
       }
     } catch (error) {
@@ -138,6 +141,8 @@ const Mesa = ({route}: any) => {
 
   useEffect(() => {
     async function getParams() {
+      const TRANSFERIR_ITENS_MESA = await AsyncStorage.getItem("TRANSFERIR_ITENS_MESA")
+      setTRANSFERIR_ITENS_MESA(TRANSFERIR_ITENS_MESA || '')
       const servername = user.servername;
       const serverport = user.serverport;
       const pathbanco = user.pathbanco;
@@ -236,9 +241,17 @@ const Mesa = ({route}: any) => {
     getParams();
   }, []);
 
+  const [EXCLUIR_ITEM_CASH, setEXCLUIR_ITEM_CASH] = useState("")
+
   const removerItem = useCallback(
     async (iditemmovimento: any) => {
-      console.log('Função removerItem ativada!');
+      
+      const EXCLUIR_ITEM_CASH = await AsyncStorage.getItem("EXCLUIR_ITEM_CASH")
+      
+      if (!EXCLUIR_ITEM_CASH) {
+        Alert.alert("Erro: ", "Usuário sem permissão para excluir item da mesa.")
+        return;
+      }
 
       const servername = user.servername;
       const serverport = user.serverport;
@@ -373,6 +386,10 @@ const Mesa = ({route}: any) => {
           <CardTrasnfetirImprimir
             idmovimento={idmovimento}
             onPressTransferir={() => {
+              if (!TRANSFERIR_ITENS_MESA) {
+                Alert.alert("Erro:", "Usuário sem permissão para transferir itens da mesa.")
+                return;
+              }
               setshowmodalescolhernummesatransferir(true);
             }}
             info={infoMesa}
@@ -399,15 +416,18 @@ const Mesa = ({route}: any) => {
           onPressExcluir={removerItem}
         />
       </ScrollView>
+      {idmovimento &&
       <View
         style={{
           paddingHorizontal: 10,
           borderWidth: 1,
           borderTopLeftRadius: 10,
           borderTopRightRadius: 10,
-          paddingBottom: 10
+          paddingBottom: 10,
         }}>
+
         {/* Card de receber pagamento (SafraPay) */}
+        
         <TouchableOpacity
           onPress={() => {
             setshowmodalreceberpagamento(true);
@@ -419,7 +439,7 @@ const Mesa = ({route}: any) => {
         </TouchableOpacity>
 
         {/* Pagamentos: card com activity indicator quando carregando */}
-      </View>
+      </View>}
 
       {/* Modal de seleção de parceiro */}
       <ModalSelecionarFornecedor
@@ -466,7 +486,7 @@ const Mesa = ({route}: any) => {
               onPress={() => setshowmodalreceberpagamento(false)}>
               <Text style={styles.btnFecharText}>Cancelar</Text>
             </TouchableOpacity>
-            
+
             {empresa?.geraparcelaversapospagamento === 'S' &&
               showpagamentosrecebidos &&
               idmovimento && (
@@ -615,7 +635,26 @@ const Mesa = ({route}: any) => {
                   {backgroundColor: '#2A64D0'},
                 ]}
                 onPress={() => {
+                  if (route.params?.nummesa == nummesatransferir) {
+                    Alert.alert(
+                      'Alerta:',
+                      'Impossível transferir para a mesma mesa.',
+                    );
+                    return;
+                  }
+
+                  if (/^-?\d+$/.test(nummesatransferir)) {
+                    
+                  } else {
+                     Alert.alert(
+                      'Erro:',
+                      'Número de mesa inválido',
+                    );
+                    return
+                  }
+
                   setshowmodalescolhernummesatransferir(false);
+
                   reset(Rotas.TransferirMesa, {
                     itensmovimento: itensmovimento,
                     nummesaatual: route.params?.nummesa,

@@ -10,39 +10,40 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { LoginInputNumeric } from '../components/LoginNumericInput';
-import { LoginInputText } from '../components/LoginTextInput';
-import { ButtonCustom } from '../components/Button';
+import {LoginInputNumeric} from '../components/LoginNumericInput';
+import {LoginInputText} from '../components/LoginTextInput';
+import {ButtonCustom} from '../components/Button';
 import Rotas from '../Rotas/Rotas';
-import { useEffect, useState } from 'react';
+import {useEffect, useState} from 'react';
 import SwitchCustom from '../components/Switch';
-import { useUser } from '../Context/userContext';
-import { useDebug } from '../Context/debugContext';
+import {useUser} from '../Context/userContext';
+import {useDebug} from '../Context/debugContext';
 import {
   ConsultaParametros,
   loginEfetuarLogin,
   loginValidarAcesso,
+  UsuarioPermissoes,
 } from '../API/api_rotas';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useEmpresa } from '../Context/empresaContext';
-import { ScrollView } from 'react-native-gesture-handler';
-import { reset } from '../Rotas/NavigatorContainerRef';
+import {useEmpresa} from '../Context/empresaContext';
+import {ScrollView} from 'react-native-gesture-handler';
+import {reset} from '../Rotas/NavigatorContainerRef';
 import valores from '../constants/constants';
-import { setApiUrl } from '../API/api';
+import {setApiUrl} from '../API/api';
 
 const Login = ({}: any) => {
-  const { user, setUser } = useUser();
+  const {user, setUser} = useUser();
   const [usuario, setusuario] = useState('');
   const [senha, setSenha] = useState('');
   const [CNPJ, setCNPJ] = useState('');
   const [configContador, setConfigContador] = useState(0);
-  const { debug, setDebug } = useDebug();
+  const {debug, setDebug} = useDebug();
   const [gravarCredenciais, setgravarCredenciais] = useState(false);
   const [isloading, setisloading] = useState(false);
   const [modalParametrosVisivel, setModalParametrosVisivel] = useState(false);
   const [parametros, setParametros] = useState([] as any[]);
   const [idparametroselecionado, setidparametroselecionado] = useState('');
-  const { empresa, setEmpresa } = useEmpresa();
+  const {empresa, setEmpresa} = useEmpresa();
   const [apiURL, setapiurlchange] = useState('');
 
   useEffect(() => {
@@ -64,6 +65,27 @@ const Login = ({}: any) => {
 
     getParams();
   }, []);
+
+  async function setarParametrosUsuario(permissoes: any) {
+    AsyncStorage.removeItem('ALTERAR_QUANTIDADE_PESSOAS_MESA');
+    AsyncStorage.removeItem('EXCLUIR_ITEM_CASH');
+    AsyncStorage.removeItem('VISUALIZAR_DASHBOARD_MOBILE');
+    AsyncStorage.removeItem('PERMISSAO_ADMINISTRADOR');
+    AsyncStorage.removeItem('PERMISSAO_VISUALIZAR_TODOS_MOVIMENTOS');
+    AsyncStorage.removeItem('ALTERAR_PARCEIRO_MESA');
+    AsyncStorage.removeItem('REMOVER_TAXA_SERVICO_MESA');
+    AsyncStorage.removeItem('TRANSFERIR_ITENS_MESA');
+    AsyncStorage.removeItem('VISUALIZAR_DASHBOARD_EMPRESA');
+    AsyncStorage.removeItem('ALTERAR_QUANTIDADE_ITEMMOVIMENTO');
+    AsyncStorage.removeItem('VENDER_PRODUTO_FRACIONADO');
+    AsyncStorage.removeItem('ALTERAR_PRECO_PRODUTO');
+
+    //=-=-==-=-=-=--=-= PARAMETROS USUARIO -=-=-==--==--=--=--
+    for (let i = 0; i < permissoes.length; i++) {
+      console.log('SETANDO PERMISSAO: ', permissoes[i])
+      AsyncStorage.setItem(permissoes[i], '1');
+    }
+  }
 
   async function validarAcesso() {
     try {
@@ -120,6 +142,20 @@ const Login = ({}: any) => {
         idfuncionario,
       });
 
+      const responsePermissoes = await UsuarioPermissoes({
+        servername: servername,
+        serverport: serverport,
+        pathbanco: pathbanco,
+        idusuario: usuario,
+      });
+
+      let ListaPermissoesUsuario = [];
+
+      for (let i = 0; i < responsePermissoes.data.length; i++) {
+        ListaPermissoesUsuario.push(responsePermissoes.data[i].permissao);
+      }
+      setarParametrosUsuario(ListaPermissoesUsuario);
+
       const responseConsultaParametros = await ConsultaParametros({
         servername,
         serverport,
@@ -136,7 +172,7 @@ const Login = ({}: any) => {
         return;
       }
       setEmpresa(responseConsultaParametros.data[0]);
-      reset(Rotas.PaginaInicial, { 'origem:': 'login' });
+      reset(Rotas.PaginaInicial, {'origem:': 'login'});
       setisloading(false);
     } catch (error) {
     } finally {
@@ -144,7 +180,7 @@ const Login = ({}: any) => {
     }
   }
 
-  const renderParametro = ({ item, index }: any) => {
+  const renderParametro = ({item, index}: any) => {
     return (
       <View
         key={item.cnpj}
@@ -155,14 +191,12 @@ const Login = ({}: any) => {
             : index % 2 === 0
             ? s.evenItem
             : s.oddItem,
-        ]}
-      >
+        ]}>
         <TouchableOpacity
           onPress={() => {
             setidparametroselecionado(`${item.idparametro}`);
             setEmpresa(item);
-          }}
-        >
+          }}>
           <View style={s.empresaContent}>
             <View style={s.empresaInfo}>
               <Text style={s.Tx2}>
@@ -186,8 +220,7 @@ const Login = ({}: any) => {
       <ImageBackground
         source={require('../assets/Images/wallpaper3.png')}
         style={s.backgroundImage}
-        resizeMode="cover"
-      >
+        resizeMode="cover">
         <Text style={s.txtversao}>{valores.versao}</Text>
         {debug && (
           <View style={s.debugview}>
@@ -221,8 +254,7 @@ const Login = ({}: any) => {
           transparent
           animationType="fade"
           onRequestClose={() => setModalParametrosVisivel(false)}
-          style={s.modalParametros}
-        >
+          style={s.modalParametros}>
           <View style={s.modalBackground}>
             <View style={s.modalContent}>
               <Text style={[s.Tx1, s.headerText]}>Selecione a empresa</Text>
@@ -240,8 +272,7 @@ const Login = ({}: any) => {
                     setParametros([]);
                     setModalParametrosVisivel(false);
                     setEmpresa(undefined);
-                  }}
-                >
+                  }}>
                   <Text style={s.txtCancelar}>Cancelar</Text>
                 </TouchableOpacity>
                 <ButtonCustom
@@ -267,8 +298,7 @@ const Login = ({}: any) => {
               }}
               onPress={() => {
                 setConfigContador(configContador + 1);
-              }}
-            >
+              }}>
               <Image
                 style={s.logoImage}
                 source={require('../assets/Images/VersaPOSlogo.png')}
@@ -295,13 +325,13 @@ const Login = ({}: any) => {
                 label={'API'}
                 placeholder={'Endereço da API'}
               />
-              <View style={{ flexDirection: 'row' }}>
+              <View style={{flexDirection: 'row'}}>
                 <ButtonCustom
                   title="Salvar"
                   onPress={() => {
                     setApiUrl(apiURL);
                   }}
-                  style={{ marginTop: 5 }}
+                  style={{marginTop: 5}}
                 />
                 <ButtonCustom
                   title="Limpar"
@@ -309,7 +339,7 @@ const Login = ({}: any) => {
                     setapiurlchange('');
                     setApiUrl('');
                   }}
-                  style={{ backgroundColor: 'red', marginTop: 5 }}
+                  style={{backgroundColor: 'red', marginTop: 5}}
                 />
               </View>
             </View>
@@ -391,12 +421,12 @@ const s = StyleSheet.create({
   buttonAcessar: {
     marginTop: 30,
   },
-  inputs: { marginTop: 15 },
+  inputs: {marginTop: 15},
   switchView: {
     flexDirection: 'row',
   },
   switch: {},
-  gravarSwitch: { alignSelf: 'center', marginTop: 15 },
+  gravarSwitch: {alignSelf: 'center', marginTop: 15},
   modalParametros: {
     backgroundColor: 'transparent',
   },
@@ -452,7 +482,7 @@ const s = StyleSheet.create({
     height: 32,
     resizeMode: 'contain',
   },
-  flatlistParametro: { flexGrow: 0 },
+  flatlistParametro: {flexGrow: 0},
   viewBotoesModalParametros: {
     marginVertical: 10,
     flexDirection: 'row',
@@ -471,11 +501,11 @@ const s = StyleSheet.create({
     alignSelf: 'center',
     marginVertical: 3,
   },
-  txtversao: { position: 'absolute', bottom: 0, color: 'white' },
-  empresacontextview: { backgroundColor: 'white', padding: 10 },
-  empresacontexttext: { fontWeight: 'bold', marginBottom: 5 },
-  empresacontextscroll: { flex: 1, marginLeft: 5 },
-  empresacontextitemmaptext: { marginBottom: 2 },
+  txtversao: {position: 'absolute', bottom: 0, color: 'white'},
+  empresacontextview: {backgroundColor: 'white', padding: 10},
+  empresacontexttext: {fontWeight: 'bold', marginBottom: 5},
+  empresacontextscroll: {flex: 1, marginLeft: 5},
+  empresacontextitemmaptext: {marginBottom: 2},
   debugview: {
     maxHeight: '20%',
     width: '100%',
@@ -484,4 +514,4 @@ const s = StyleSheet.create({
   },
 });
 
-export { Login };
+export {Login};

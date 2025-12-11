@@ -36,7 +36,7 @@ export type SafraPrintSize =
   | 'medium'
   | 'large'
   | 'extra_large';
-export type SafraPrintStyle = 'normal' | 'bold' | 'invert';
+export type SafraPrintStyle = 'normal' | 'bold' | 'invert' | 'italic';
 
 export interface SafraPrintLine {
   /** tipo da linha: 'text' (padrão) ou 'blank' (linha em branco) */

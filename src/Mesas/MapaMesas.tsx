@@ -10,30 +10,30 @@ import {
   View,
 } from 'react-native';
 import colors from '../ThemeContext/colors';
-import { ButtonCustom } from '../components/Button';
+import {ButtonCustom} from '../components/Button';
 
-import { useEffect, useState } from 'react';
-import { LoginInputNumeric } from '../components/LoginNumericInput';
+import {useEffect, useState} from 'react';
+import {LoginInputNumeric} from '../components/LoginNumericInput';
 import CardMesa from '../components/CardMesa';
 
 import Rotas from '../Rotas/Rotas';
 import Cabecalho from '../components/Cabecalho';
-import { useDebug } from '../Context/debugContext';
-import { MovimentoPesquisa } from '../API/api_rotas';
-import { useEmpresa } from '../Context/empresaContext';
-import { useUser } from '../Context/userContext';
+import {useDebug} from '../Context/debugContext';
+import {MovimentoPesquisa} from '../API/api_rotas';
+import {useEmpresa} from '../Context/empresaContext';
+import {useUser} from '../Context/userContext';
 import formatDate from '../Functions/formatDate';
-import { reset } from '../Rotas/NavigatorContainerRef';
+import {reset} from '../Rotas/NavigatorContainerRef';
 
 type MesaProps = {
   nummesa: any; // ou number, se você souber que é numérico
   [key: string]: any; // permite múltiplas outras chaves
 };
 
-const MapaMesas = ({  }: any) => {
+const MapaMesas = ({}: any) => {
   const [pesquisa, setPesquisa] = useState('');
 
-  const { debug } = useDebug();
+  const {debug} = useDebug();
 
   const pageSize = 10;
   const [PaginaAtual, setPaginaAtual] = useState(1);
@@ -44,8 +44,8 @@ const MapaMesas = ({  }: any) => {
   const [recarregarMesas, setrecarregarMesas] = useState(0);
   const [modalParametrosVisivel, setmodalParametrosVisivel] = useState(false);
 
-  const { empresa } = useEmpresa();
-  const { user } = useUser();
+  const {empresa} = useEmpresa();
+  const {user} = useUser();
 
   const [inputGerenciarMesa, setinputGerenciarMesa] = useState('');
 
@@ -89,7 +89,6 @@ const MapaMesas = ({  }: any) => {
           datafimmovimentos,
         });
 
-        // Alert.alert('data: ', JSON.stringify(response));
         setdata(response.data);
 
         setPaginaAtual(1);
@@ -104,18 +103,45 @@ const MapaMesas = ({  }: any) => {
     getParams();
   }, [recarregarMesas]);
 
-  useEffect(() => {
-    if (!pesquisa) {
-      setrecarregarMesas(r => r + 1);
-      return;
+
+  async function Pesquisar() {
+    setIsloadingMesaLista(true);
+    try {
+      const today = new Date();
+      const datainiciomovimentos = formatDate(new Date(today), -1); // Data inicial com dia atual - 1
+      const datafimmovimentos = formatDate(new Date(today)); // Data final com dia atual
+      const response = await MovimentoPesquisa({
+        servername: user.servername,
+        serverport: user.serverport,
+        pathbanco: user.pathbanco,
+        idempresa: empresa?.idparametro,
+        order: 'nummesa',
+        valorpesquisamesa: pesquisa,
+        statusmesa: ['R', 'O'],
+        datainiciomovimentos,
+        datafimmovimentos,
+      });
+
+      setdata(response.data);
+
+      setPaginaAtual(1);
+      const getMesasIniciais = pagination(response.data, 1, pageSize);
+      setMapaMesasDataRender(getMesasIniciais);
+
+      if (!pesquisa) {
+        return;
+      }
+      const mesas = response.data as MesaProps[]
+      const mesasFiltradas = mesas.filter(
+        mesa => mesa.nummesa === Number(pesquisa),
+      );
+
+      setMapaMesasDataRender(mesasFiltradas);
+    } catch (error) {
+    } finally {
+      setIsloadingMesaLista(false);
     }
-
-    const mesasFiltradas = data.filter(
-      mesa => mesa.nummesa === Number(pesquisa),
-    );
-
-    setMapaMesasDataRender(mesasFiltradas);
-  }, [pesquisa]);
+  }
 
   return (
     <View style={s.MainView}>
@@ -130,11 +156,33 @@ const MapaMesas = ({  }: any) => {
       />
 
       <View style={s.body}>
-        <LoginInputNumeric
-          value={pesquisa}
-          onChangeText={setPesquisa}
-          placeholder="Pesquisar mesas ocupadas..."
-        />
+        <View style={{flexDirection: 'row'}}>
+          <LoginInputNumeric
+            value={pesquisa}
+            onChangeText={setPesquisa}
+            placeholder="Pesquisar mesas ocupadas..."
+          />
+
+          <TouchableOpacity onPress={() => {
+            Pesquisar()
+          }}>
+            <Text
+              style={{
+                backgroundColor: '#7392CD',
+                paddingHorizontal: 6,
+                textAlign: 'center',
+                marginLeft: 2,
+                borderRadius: 10,
+                padding: 10,
+                marginRight: 0,
+                fontSize: 18,
+                alignSelf: 'center',
+                color: 'white',
+              }}>
+              pesquisar
+            </Text>
+          </TouchableOpacity>
+        </View>
         {isLoadingMesaLista && <ActivityIndicator size={'large'} />}
         <FlatList
           onEndReachedThreshold={0.7}
@@ -167,7 +215,7 @@ const MapaMesas = ({  }: any) => {
             setIsloadingMesaLista(false);
           }}
           data={MapaMesasDataRender}
-          renderItem={({ item }) => {
+          renderItem={({item}) => {
             return (
               <View style={s.itemflatlist}>
                 <TouchableOpacity
@@ -180,8 +228,7 @@ const MapaMesas = ({  }: any) => {
                       data: `${dataenviar}`,
                       statusmesa: item.statusmesa,
                     });
-                  }}
-                >
+                  }}>
                   <CardMesa mesa={item} />
                 </TouchableOpacity>
               </View>
@@ -205,14 +252,13 @@ const MapaMesas = ({  }: any) => {
         transparent
         animationType="fade"
         onRequestClose={() => setmodalParametrosVisivel(false)}
-        style={{}}
-      >
+        style={{}}>
         <TouchableOpacity
           style={s.modalBackGround}
-          onPress={() => {setmodalParametrosVisivel(false);
-            setinputGerenciarMesa('')
-          }}
-        >
+          onPress={() => {
+            setmodalParametrosVisivel(false);
+            setinputGerenciarMesa('');
+          }}>
           <TouchableOpacity activeOpacity={1}>
             <View style={s.modalCard}>
               <Text style={s.modalTitle}>Digite o número da mesa:</Text>
@@ -243,12 +289,12 @@ const MapaMesas = ({  }: any) => {
                     : 'Abrir nova mesa'
                 }
                 onPress={() => {
-                  if (!inputGerenciarMesa){
-                    Alert.alert("Alerta", "digite o número da mesa!")
+                  if (!inputGerenciarMesa) {
+                    Alert.alert('Alerta', 'digite o número da mesa!');
                     return;
                   }
                   setmodalParametrosVisivel(false);
-                  
+
                   const dataenviar = new Date();
 
                   // procura mesa na lista
@@ -341,7 +387,7 @@ const s = StyleSheet.create({
   ButtonMesaOcupada: {
     backgroundColor: 'red',
   },
-  ButtonMesaLivre: { backgroundColor: 'green' },
+  ButtonMesaLivre: {backgroundColor: 'green'},
 });
 
 export default MapaMesas;
