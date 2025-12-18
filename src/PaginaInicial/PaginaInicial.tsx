@@ -39,7 +39,7 @@ const PaginaInicial = ({ navigation }: any) => {
           </Text>
         </>
       )}
-      {debug && (
+      {!debug && (
         <View
           style={{
             maxHeight: '20%',
@@ -77,6 +77,9 @@ const PaginaInicial = ({ navigation }: any) => {
           </ScrollView>
         </View>
       )}
+
+
+      <Text>{user.idfuncionario} - {user.usuario}</Text>
 
       <View style={s.mainContainer}>
         <View style={s.logoView}>

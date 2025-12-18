@@ -119,6 +119,13 @@ const Login = ({}: any) => {
         JSON.stringify(responseEfetuarLogin.data),
       );
 
+      if (responseEfetuarLogin.data?.erro){
+        console.log('entrou')
+
+        Alert.alert("Erro no login:", responseEfetuarLogin.data?.erro)
+        return;
+      }
+
       const idfuncionario = responseEfetuarLogin.data.idfuncionario;
 
       if (gravarCredenciais) {

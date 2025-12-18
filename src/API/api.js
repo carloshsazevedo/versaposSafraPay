@@ -14,14 +14,14 @@ export async function getApi() {
     const savedUrl = await AsyncStorage.getItem("API_URL");
     api = axios.create({
       baseURL: savedUrl || DEFAULT_URL,
-      timeout: 5000,
+      timeout: 10000,
     });
 
     //### interceptors (tratamento global de erros)
     api.interceptors.response.use(
       (response) => {
     //### 🔹 Tratar erro mesmo com status 200
-    
+        console.log('tratando resposta...')
     if (response?.data?.erro) {
       if (response.data.erro !== 'Parcela(s) não encontrado(s).'){
       Alert.alert("Resultado:", response.data.erro);}
@@ -40,6 +40,8 @@ if (response?.data?.mensagem){
 
     return response;},
       (error) => {
+
+   console.log('tratando erro...')
         
         if (error.code === "ECONNABORTED") {
           Alert.alert("Tempo de conexão excedido");
