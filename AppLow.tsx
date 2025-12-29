@@ -5,6 +5,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import MainNavigator from './src/Rotas/MainNavigator';
 import { useUser } from './src/Context/userContext';
 import { useEmpresa } from './src/Context/empresaContext';
+import { initApi } from './src/API/api';
 
 function AppLow() {
   const { setEmpresa } = useEmpresa();
@@ -13,6 +14,8 @@ function AppLow() {
 
   async function restaurarContextos() {
     try {
+      await initApi();
+
       const storedUser = await AsyncStorage.getItem('@user');
       const storedEmpresa = await AsyncStorage.getItem('@empresa');
 

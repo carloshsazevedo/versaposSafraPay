@@ -39,7 +39,7 @@ const PaginaInicial = ({ navigation }: any) => {
           </Text>
         </>
       )}
-      {!debug && (
+      {debug && (
         <View
           style={{
             maxHeight: '20%',
