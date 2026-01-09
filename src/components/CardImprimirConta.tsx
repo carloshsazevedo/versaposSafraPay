@@ -1,10 +1,17 @@
 import React from 'react';
 import {Alert, Image, StyleSheet, TouchableOpacity} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
-
+import { imprimirConta as imprimirContaMesa } from '../API/api_rotas';
 import {imprimirCupomSafra, SafraPrintLine} from '../native/safrapay';
+import { useUser } from '../Context/userContext';
+import { useEmpresa } from '../Context/empresaContext';
 
-const CardImprimirConta = ({info}: any) => {
+const CardImprimirConta = ({info, idmovimento}: any) => {
+
+
+  const {user} = useUser()
+  const {empresa} = useEmpresa();
+
   function agruparItensPorCodigo(itens: any[]) {
     const mapa: Record<string, any> = {};
 
@@ -140,6 +147,14 @@ const CardImprimirConta = ({info}: any) => {
         'Erro ao enviar impressão SafraPay',
         err?.message || String(err),
       );
+    }
+    finally{
+
+      
+
+      const result = await imprimirContaMesa({servername: user.servername, serverport: user.serverport, pathbanco: user.pathbanco, idmovimento, idempresa: empresa?.idparametro, idusuario: user.usuario})
+
+
     }
   }
 

@@ -31,6 +31,7 @@ const CardTrasnfetirImprimir = ({
 
       <CardImprimirConta
         info={info}
+        idmovimento={idmovimento}
       />
     </View>
   );

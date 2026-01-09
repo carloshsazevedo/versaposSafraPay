@@ -6,7 +6,8 @@ import { useEmpresa } from '../Context/empresaContext';
 import { ProdutoImagemProduto } from '../API/api_rotas';
 import ModalObservacao from './CardModalObservacoesProdutoCarrinho';
 
-const ProdutoCardCarrinho = React.memo(({ produto }: { produto: any }) => {
+const ProdutoCardCarrinho = React.memo(
+  ({ produto, onObservacao }: { produto: any; onObservacao: () => void }) => {
   const { setCarrinho, alterarObservacao } = useCarrinho();
 
   const [modalVisible, setModalVisible] = useState(false);

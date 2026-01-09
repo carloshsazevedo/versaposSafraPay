@@ -148,6 +148,26 @@ export async function UsuarioPermissoes(credentials: any) {
   return response;
 }
 
+export async function imprimirConta(credentials: any) {
+  const api = await getApi();
+  const response = await api.post('/imprimirconta', credentials);
+  return response;
+}
+
+export async function CadastroItemmovimentoPago(credentials: any) {
+  const api = await getApi();
+  const response = await api.post('/cadastro/itemmovimentopago', credentials);
+  return response;
+}
+
+export async function ConsultaImtemmovimentopago(credentials: any) {
+  const api = await getApi();
+  const response = await api.post('/consulta/itemmovimentopago', credentials);
+  return response;
+}
+
+
+
 
 
 

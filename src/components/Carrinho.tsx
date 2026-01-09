@@ -4,7 +4,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import renderitemcarrinho from './renderItemCarrinho';
+// import renderitemcarrinho from './renderItemCarrinho';
 import { ButtonCustom } from './Button';
 import CardNumMesa from './CardNumMesa';
 import { reset } from '../Rotas/NavigatorContainerRef';
@@ -16,6 +16,9 @@ import {
   MovimentoInserirItensCarrinhoMesa,
 } from '../API/api_rotas';
 import { useCarrinho } from '../Context/carrinhoContext';
+import { useState } from 'react';
+import ProdutoCardCarrinho from './CardProdutoInserirCarrinho';
+import ModalObservacao from './CardModalObservacoesProdutoCarrinho';
 
 interface CarrinhoProps {
   nummesa?: any;
@@ -35,7 +38,17 @@ const Carrinho = ({
 
   const { empresa } = useEmpresa();
   const { user } = useUser();
-  const {carrinho, setCarrinho} = useCarrinho();
+  const {carrinho, setCarrinho, alterarObservacao} = useCarrinho();
+
+  const [modalVisible, setModalVisible] = useState(false);
+  const [produtoSelecionado, setProdutoSelecionado] = useState<any>(null);
+
+  function abrirModalObservacao(produto: any) {
+  setProdutoSelecionado(produto);
+  setModalVisible(true);
+}
+
+
 
   async function InserirProdutosMovimentoCarrinho() {
     let idmov = idmovimento;
@@ -138,12 +151,39 @@ const Carrinho = ({
         />
       </View>
 
-      <FlatList
+      {/* <FlatList
       // ListHeaderComponent={<View><Text>{JSON.stringify(carrinho)}</Text></View>}
         data={carrinho}
         renderItem={renderitemcarrinho}
         keyExtractor={item => item.codigobarras}
-      />
+      /> */}
+
+      <FlatList
+  data={carrinho}
+  keyExtractor={(item) => String(item.idproduto)}
+  keyboardShouldPersistTaps="handled"
+  removeClippedSubviews={false}
+  renderItem={({ item }) => (
+    <ProdutoCardCarrinho
+      produto={item}
+      onObservacao={() => abrirModalObservacao(item)}
+    />
+
+
+  )}
+/>
+
+<ModalObservacao
+  visible={modalVisible}
+  initialValue={produtoSelecionado?.observacoes ?? ''}
+  onClose={() => setModalVisible(false)}
+  onSave={(texto: string) => {
+    alterarObservacao(produtoSelecionado.idproduto, texto);
+    setModalVisible(false);
+  }}
+/>
+
+
     </View>
   );
 };

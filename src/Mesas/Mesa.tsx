@@ -591,7 +591,8 @@ const Mesa = ({route}: any) => {
               onPress={() => setpagamentoparcial(false)}>
               <Text style={styles.btnFecharText}>Cancelar</Text>
             </TouchableOpacity>
-
+            {/* <Text>{itensmovimento[0].codigobarras}</Text> */}
+            
             <CardReceberPagamentoParcial
               itens={itensmovimento}
               idmovimento={idmovimento}

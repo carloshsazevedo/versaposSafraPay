@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import {
   Alert,
   Keyboard,
@@ -12,10 +12,13 @@ import {
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 
-import { useUser } from '../Context/userContext';
-import { useEmpresa } from '../Context/empresaContext';
-import { CadastroMovimentoPagamento } from '../API/api_rotas';
-import { reset } from '../Rotas/NavigatorContainerRef';
+import {useUser} from '../Context/userContext';
+import {useEmpresa} from '../Context/empresaContext';
+import {
+  CadastroItemmovimentoPago,
+  CadastroMovimentoPagamento,
+} from '../API/api_rotas';
+import {reset} from '../Rotas/NavigatorContainerRef';
 import Rotas from '../Rotas/Rotas';
 
 import {
@@ -32,6 +35,7 @@ type Props = {
   total: number;
   idmovimento: string | number;
   nummesa: string | number;
+  ids?: any[];
 };
 
 type PaymentMethodKey =
@@ -85,9 +89,10 @@ const CardReceberPagamento: React.FC<Props> = ({
   total,
   idmovimento,
   nummesa,
+  ids,
 }) => {
-  const { user } = useUser();
-  const { empresa } = useEmpresa();
+  const {user} = useUser();
+  const {empresa} = useEmpresa();
 
   const [loading, setLoading] = useState(false);
 
@@ -129,31 +134,30 @@ const CardReceberPagamento: React.FC<Props> = ({
    * Ex.: "120,50" -> 120.5   |  "1.234,56" -> 1234.56
    */
   function parseAmount(text: string): number {
-  if (!text) return 0;
+    if (!text) return 0;
 
-  let t = text.trim();
+    let t = text.trim();
 
-  // Se tiver vírgula, assume que vírgula é decimal
-  if (t.includes(',')) {
-    // remove pontos de milhar, ex.: 1.234,56 → 1234,56
-    t = t.replace(/\./g, '');
-    // vírgula decimal → ponto
-    t = t.replace(',', '.');
+    // Se tiver vírgula, assume que vírgula é decimal
+    if (t.includes(',')) {
+      // remove pontos de milhar, ex.: 1.234,56 → 1234,56
+      t = t.replace(/\./g, '');
+      // vírgula decimal → ponto
+      t = t.replace(',', '.');
+      const n = Number(t);
+      return isNaN(n) ? 0 : n;
+    }
+
+    // Se NÃO tiver vírgula, mas tiver ponto → assume ponto como decimal
+    if (t.includes('.')) {
+      const n = Number(t);
+      return isNaN(n) ? 0 : n;
+    }
+
+    // Caso seja somente número inteiro
     const n = Number(t);
     return isNaN(n) ? 0 : n;
   }
-
-  // Se NÃO tiver vírgula, mas tiver ponto → assume ponto como decimal
-  if (t.includes('.')) {
-    const n = Number(t);
-    return isNaN(n) ? 0 : n;
-  }
-
-  // Caso seja somente número inteiro
-  const n = Number(t);
-  return isNaN(n) ? 0 : n;
-}
-
 
   async function registrarPagamentoBackend(
     orderId: string,
@@ -179,16 +183,34 @@ const CardReceberPagamento: React.FC<Props> = ({
       resultado_safra: result.raw,
     });
 
-    console.log("Retorno do cadastro movimentopagamento: ", JSON.stringify(res))
+    console.log(
+      'Retorno do cadastro movimentopagamento: ',
+      JSON.stringify(res),
+    );
+
+    if (ids){
+    const resultado = await CadastroItemmovimentoPago({
+      idmovimento,
+      lista: ids,
+      servername: user.servername,
+      serverport: user.serverport,
+      pathbanco: user.pathbanco,
+      idempresa: empresa?.idparametro,
+      idusuario: user.usuario
+    });
+    }
 
     const dataenviar = new Date();
 
-    reset(Rotas.Mesa as never, {
-      idmovimento: idmov,
-      nummesa: mesa,
-      data: `${dataenviar}`,
-      statusmesa: 'O',
-    } as never);
+    reset(
+      Rotas.Mesa as never,
+      {
+        idmovimento: idmov,
+        nummesa: mesa,
+        data: `${dataenviar}`,
+        statusmesa: 'O',
+      } as never,
+    );
   }
 
   /**
@@ -301,6 +323,11 @@ const CardReceberPagamento: React.FC<Props> = ({
   }
 
   function abrirModalValor() {
+    if (total <= 0) {
+      Alert.alert('Impossível receber valor menor ou igual a zero!');
+      return;
+    }
+
     if (loading) return;
     // sempre que abrir, sincroniza o valor padrão com o total
     setAmountText(total.toFixed(2).replace('.', ','));
@@ -331,7 +358,7 @@ const CardReceberPagamento: React.FC<Props> = ({
           </Text>
           <Text style={s.valueText}>
             Total a receber:{' '}
-            {`R$ ${total.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`}
+            {`R$ ${total.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`}
           </Text>
         </LinearGradient>
       </TouchableOpacity>
@@ -359,8 +386,7 @@ const CardReceberPagamento: React.FC<Props> = ({
 
               <Text style={s.label}>Informe o valor do pagamento</Text>
               <Text style={s.helperText}>
-                Você pode reduzir
-                para receber um valor parcial.
+                Você pode reduzir para receber um valor parcial.
               </Text>
 
               <View style={s.inputRow}>
