@@ -280,6 +280,7 @@ const CardPagamentoParcial = ({itens, idmovimento, nummesa}: any) => {
                     <Text style={s.label}>Total do item:</Text>
 
                     <TextInput
+                    editable={false}
                       style={s.inputValor}
                       keyboardType="numeric"
                       value={
@@ -332,7 +333,7 @@ const CardPagamentoParcial = ({itens, idmovimento, nummesa}: any) => {
 
       <View style={s.totalBox}>
         <Text style={s.totalTxt}>
-          Total a pagar: R$ {Number(totalPagar).toFixed(2)}
+          Total a pagar: R$ {String(Number(totalPagar).toFixed(2)).replace('.',',')}
         </Text>
       </View>
 
@@ -343,6 +344,7 @@ const CardPagamentoParcial = ({itens, idmovimento, nummesa}: any) => {
           idmovimento={idmovimento}
           nummesa={nummesa}
           ids={listaSelecionados}
+          blockedit={true}
         />
       </TouchableOpacity>
     </View>

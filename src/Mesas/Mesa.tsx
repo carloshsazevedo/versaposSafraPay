@@ -52,9 +52,6 @@ const Mesa = ({route}: any) => {
   // const [totalMesa, settotalMesa] = useState(0.0);
   const {user} = useUser();
   const {empresa} = useEmpresa();
-
-  console.log('renderizando BOOOOOOOOOOOOOOOOOO!');
-
   const [pagamentoparcial, setpagamentoparcial] = useState(false);
 
   const [

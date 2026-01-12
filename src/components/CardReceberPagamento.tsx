@@ -36,6 +36,7 @@ type Props = {
   idmovimento: string | number;
   nummesa: string | number;
   ids?: any[];
+  blockedit?: boolean;
 };
 
 type PaymentMethodKey =
@@ -90,6 +91,7 @@ const CardReceberPagamento: React.FC<Props> = ({
   idmovimento,
   nummesa,
   ids,
+  blockedit,
 }) => {
   const {user} = useUser();
   const {empresa} = useEmpresa();
@@ -188,16 +190,16 @@ const CardReceberPagamento: React.FC<Props> = ({
       JSON.stringify(res),
     );
 
-    if (ids){
-    const resultado = await CadastroItemmovimentoPago({
-      idmovimento,
-      lista: ids,
-      servername: user.servername,
-      serverport: user.serverport,
-      pathbanco: user.pathbanco,
-      idempresa: empresa?.idparametro,
-      idusuario: user.usuario
-    });
+    if (ids) {
+      const resultado = await CadastroItemmovimentoPago({
+        idmovimento,
+        lista: ids,
+        servername: user.servername,
+        serverport: user.serverport,
+        pathbanco: user.pathbanco,
+        idempresa: empresa?.idparametro,
+        idusuario: user.usuario,
+      });
     }
 
     const dataenviar = new Date();
@@ -383,11 +385,17 @@ const CardReceberPagamento: React.FC<Props> = ({
                   })}
                 </Text>
               </Text>
-
-              <Text style={s.label}>Informe o valor do pagamento</Text>
-              <Text style={s.helperText}>
-                Você pode reduzir para receber um valor parcial.
-              </Text>
+              {blockedit && (
+                <Text style={[s.label, {color: "#cec435"}]}>Valor do pagamento não pode ser editado no pagamento parcial.</Text>
+              )}
+              {!blockedit && (
+                <Text style={s.label}>Informe o valor do pagamento</Text>
+              )}
+              {!blockedit && (
+                <Text style={s.helperText}>
+                  Você pode reduzir para receber um valor parcial.
+                </Text>
+              )}
 
               <View style={s.inputRow}>
                 <Text style={s.currencyPrefix}>R$</Text>
@@ -398,6 +406,7 @@ const CardReceberPagamento: React.FC<Props> = ({
                   keyboardType="numeric"
                   placeholder="0,00"
                   maxLength={12}
+                  editable={!blockedit}
                 />
               </View>
 

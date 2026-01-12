@@ -1,2 +1,2 @@
-const valores = {versao: 'v0.0.3'}
+const valores = {versao: 'v0.0.4'}
 export default valores;
